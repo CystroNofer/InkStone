@@ -1,13 +1,11 @@
 #pragma once
 
-#include "GameComponent.h"
-
 #include "src/Math/Math.h"
 
+// Angle in degrees
 namespace NXTN {
-	class Transform : GameComponent
+	class Transform
 	{
-		// Angle in degrees
 	public:
 		Transform();
 		~Transform() {}

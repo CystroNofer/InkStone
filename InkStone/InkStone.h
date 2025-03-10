@@ -1,7 +1,5 @@
 #pragma once
 
-#include "entt.hpp"
-
 #include "src/Core.h"
 
 #include "src/Layer.h"
@@ -14,18 +12,14 @@
 #include "src/Event/KeyEvent.h"
 #include "src/Event/MouseEvent.h"
 
-#include "src/Game/Component/GameComponent.h"
-#include "src/Game/Component/Camera.h"
-#include "src/Game/Component/MeshInfo.h"
+#include "src/Game/Component/Component.h"
+#include "src/Game/Component/MeshRenderer.h"
 #include "src/Game/Component/Transform.h"
 
-#include "src/Game/GameObject.h"
+#include "src/Game/GameObject/Camera.h"
+#include "src/Game/GameObject/GameObject.h"
 
-#include "src/Game/Scene.h"
-
-#include "src/Game/System/GameSystem.h"
-#include "src/Game/System/CameraController.h"
-#include "src/Game/System/MeshRenderer.h"
+#include "src/Game/Scene/Scene.h"
 
 #include "src/Math/Math.h"
 

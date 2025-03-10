@@ -9,7 +9,7 @@ namespace NXTN {
 		static void InitTime();
 		static void UpdateTime();
 
-		static inline const float& GetDeltaTime() { return m_DeltaTime; }
+		static inline float GetDeltaTime() { return m_DeltaTime; }
 
 	private:
 		static std::chrono::steady_clock::time_point m_LastTimePoint;

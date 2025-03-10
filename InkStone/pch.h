@@ -17,7 +17,6 @@
 //#include <regex>
 #include <sstream>
 #include <typeindex>
-#include <type_traits>
 #include <utility>
 
 // Data structure

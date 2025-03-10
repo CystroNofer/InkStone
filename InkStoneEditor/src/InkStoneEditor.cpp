@@ -6,6 +6,12 @@ namespace NXTN {
 	{
 		m_Name = "Sandbox Gameplay Layer";
 
+		// Camera
+		m_SceneCamera.reset(new Camera(1.0f, vec2i(windowWidth, windowHeight), false));
+		m_SceneCamera->transform.SetPosition(0.0f, 0.0f, -10.0f);
+
+		m_FrameBuffer.reset(FrameBuffer::Create(windowWidth, windowHeight));
+
 		// Temporary draw data
 		// Vertex buffer
 		// 1 3
@@ -35,27 +41,18 @@ namespace NXTN {
 		m_Texture.reset(Texture2D::Create("Asset/Texture/Logo.png"));
 
 		// Scene
-		m_TestScene.reset(new Scene());
-
-		// GameObjects & GameSystems
-		// Mesh
-		MeshInfo& meshInfo = *m_TestScene->AddComponent<MeshInfo>(*m_TestScene->CreateObject());
-		//meshInfo.mesh.reset(new Mesh(
-		//	VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
-		//	IndexBuffer::Create(indices, 6)
-		//));
-		//meshInfo.shader.reset(m_Shader.get());
-
-		m_TestScene->AddSystem<MeshRenderer>();
-
-		// Camera
-		GameObject* cameraObj = m_TestScene->CreateObject();
-		m_SceneCamera.reset(m_TestScene->AddComponent<Camera>(*cameraObj));
-		m_TestScene->GetComponent<Transform>(*cameraObj)->SetPosition(0.0f, 0.0f, -10.0f);
-
-		m_TestScene->AddSystem<CameraController>();
-
-		m_FrameBuffer.reset(FrameBuffer::Create(windowWidth, windowHeight));
+		m_TestScene.reset(new Scene);
+		GameObject* testObj = new GameObject();
+		testObj->AddComponent(
+			new MeshRenderer(
+				new Mesh(
+					VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
+					IndexBuffer::Create(indices, 6)
+				),
+				m_Shader.get()
+			)
+		);
+		m_TestScene->AddObject(testObj);
 
 		// UI config
 		// Create dockspace
@@ -156,7 +153,7 @@ namespace NXTN {
 
 				ImGui::Separator();
 
-				//DrawHierarchy(m_TestScene->AllObjects());
+				DrawHierarchy(m_TestScene->AllObjects());
 			}
 			ImGui::End();
 		}
@@ -172,18 +169,18 @@ namespace NXTN {
 		return false;
 	}
 
-	//void EditorLayer::DrawHierarchy(const std::vector<std::unique_ptr<GameObject>>& gameObjects)
-	//{
-	//	for (const std::unique_ptr<GameObject>& gameObj : gameObjects)
-	//	{
-	//		if (ImGui::TreeNode(gameObj->name.c_str()))
-	//		{
-	//			DrawHierarchy(gameObj->GetChildren());
-	//			// TODO: List components and/or other information
-	//			ImGui::TreePop();
-	//		}
-	//	}
-	//}
+	void EditorLayer::DrawHierarchy(const std::vector<std::unique_ptr<GameObject>>& gameObjects)
+	{
+		for (const std::unique_ptr<GameObject>& gameObj : gameObjects)
+		{
+			if (ImGui::TreeNode(gameObj->GetName().c_str()))
+			{
+				DrawHierarchy(gameObj->GetChildren());
+				// TODO: List components and/or other information
+				ImGui::TreePop();
+			}
+		}
+	}
 
 	// Sandbox Application
 	InkStoneEditor::InkStoneEditor()
