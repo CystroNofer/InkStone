@@ -47,7 +47,7 @@ namespace NXTN {
 
 		EventBuffer::PushEvent(new ApplicationUpdateEvent());
 
-		Time::UpdateTime();
+		Time::Update();
 
 		m_LayerStack.Update();
 

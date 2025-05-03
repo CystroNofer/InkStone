@@ -1,17 +1,17 @@
 #pragma once
 
-#include "Component.h"
+#include "Transform.h"
 
 #include "src/Rendering/Renderer.h"
 
 namespace NXTN {
-	class MeshRenderer : public Component
+	class MeshRenderer : public ObjectComponent
 	{
 	public:
 		MeshRenderer(Mesh* mesh, Shader* shader);
 		~MeshRenderer() {}
 
-		virtual void Update(Transform& transform) override;
+		void Update(const mat4& modelToWorldMatrx);
 
 	private:
 		std::shared_ptr<Mesh> m_Mesh;

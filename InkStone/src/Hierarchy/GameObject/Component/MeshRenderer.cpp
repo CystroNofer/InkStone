@@ -9,8 +9,8 @@ namespace NXTN {
 
 	}
 
-	void MeshRenderer::Update(Transform& transform)
+	void MeshRenderer::Update(const mat4& modelToWorldMatrx)
 	{
-		Renderer::DrawMesh(m_Mesh, m_Shader, transform.GetModelMatrix());
+		Renderer::DrawMesh(m_Mesh, m_Shader, modelToWorldMatrx);
 	}
 }

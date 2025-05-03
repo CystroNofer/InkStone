@@ -11,7 +11,7 @@ namespace NXTN {
 		m_LastTimePoint = std::chrono::steady_clock::now();
 	}
 
-	void Time::UpdateTime()
+	void Time::Update()
 	{
 		std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
 		m_DeltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_LastTimePoint).count() / 1000.0f;

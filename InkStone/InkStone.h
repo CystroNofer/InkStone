@@ -12,14 +12,14 @@
 #include "src/Event/KeyEvent.h"
 #include "src/Event/MouseEvent.h"
 
-#include "src/Game/Component/Component.h"
-#include "src/Game/Component/MeshRenderer.h"
-#include "src/Game/Component/Transform.h"
+#include "src/Hierarchy/GameObject/Component/ObjectComponent.h"
+#include "src/Hierarchy/GameObject/Component/MeshRenderer.h"
+#include "src/Hierarchy/GameObject/Component/Transform.h"
 
-#include "src/Game/GameObject/Camera.h"
-#include "src/Game/GameObject/GameObject.h"
+#include "src/Hierarchy/GameObject/Camera.h"
+#include "src/Hierarchy/GameObject/GameObject.h"
 
-#include "src/Game/Scene/Scene.h"
+#include "src/Hierarchy/Scene.h"
 
 #include "src/Math/Math.h"
 

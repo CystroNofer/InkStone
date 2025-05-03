@@ -41,18 +41,15 @@ namespace NXTN {
 		m_Texture.reset(Texture2D::Create("Asset/Texture/Logo.png"));
 
 		// Scene
-		m_TestScene.reset(new Scene);
-		GameObject* testObj = new GameObject();
-		testObj->AddComponent(
-			new MeshRenderer(
-				new Mesh(
-					VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
-					IndexBuffer::Create(indices, 6)
-				),
-				m_Shader.get()
-			)
-		);
-		m_TestScene->AddObject(testObj);
+		m_TestScene.reset(new Scene());
+		m_TestScene->AddObject(new GameObject(
+			"Test Object",
+			new Mesh(
+				VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
+				IndexBuffer::Create(indices, 6)
+			),
+			m_Shader.get()
+		));
 
 		// UI config
 		// Create dockspace
@@ -149,7 +146,7 @@ namespace NXTN {
 			{
 				// FPS
 				float deltaTime = Time::GetDeltaTime();
-				ImGui::Text("FPS: %.0f  (Avg %.2fms/frame)", 1000.0f / deltaTime, deltaTime * 1000.0f);
+				ImGui::Text("FPS: %.0f  (Avg %.2fms/frame)", 1.0f / deltaTime, deltaTime * 1000.0f);
 
 				ImGui::Separator();
 
@@ -173,12 +170,13 @@ namespace NXTN {
 	{
 		for (const std::unique_ptr<GameObject>& gameObj : gameObjects)
 		{
-			if (ImGui::TreeNode(gameObj->GetName().c_str()))
-			{
-				DrawHierarchy(gameObj->GetChildren());
-				// TODO: List components and/or other information
-				ImGui::TreePop();
-			}
+			//if (ImGui::TreeNode(gameObj->GetName().c_str()))
+			//{
+			//	DrawHierarchy(gameObj->GetChildren());
+			//	// TODO: List components and/or other information
+			//	ImGui::TreePop();
+			//}
+			ImGui::Text(gameObj->GetName().c_str());
 		}
 	}
 

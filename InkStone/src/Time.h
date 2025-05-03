@@ -7,7 +7,7 @@ namespace NXTN {
 	{
 	public:
 		static void InitTime();
-		static void UpdateTime();
+		static void Update();
 
 		static inline float GetDeltaTime() { return m_DeltaTime; }
 
