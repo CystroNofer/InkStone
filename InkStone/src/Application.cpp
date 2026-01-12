@@ -43,7 +43,7 @@ namespace NXTN {
 
 	void Application::Update()
 	{
-		NXTN_PROFILE_FUNCTION()
+		//NXTN_PROFILE_FUNCTION()
 
 		EventBuffer::PushEvent(new ApplicationUpdateEvent());
 

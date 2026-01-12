@@ -18,14 +18,14 @@ namespace NXTN {
 		virtual bool OnEvent(Event*& event_ptr) override;
 
 	private:
-		void DrawHierarchy(const std::vector<std::unique_ptr<GameObject>>& gameObjects);
+		//void DrawEntities(const std::vector<std::unique_ptr<Entity>>& entities);
 
 	private:
-		std::shared_ptr<Camera> m_SceneCamera;
+		//std::shared_ptr<Camera> m_SceneCamera;
 		std::shared_ptr<FrameBuffer> m_FrameBuffer;
 		std::shared_ptr<Scene> m_TestScene;
-		std::shared_ptr<Texture2D> m_Texture;
-		std::shared_ptr<Shader> m_Shader;
+		//std::shared_ptr<Texture2D> m_Texture;
+		//std::shared_ptr<Shader> m_Shader;
 
 		ImGuiID m_DockspaceID;
 		ImGuiWindowFlags m_DockSpaceFlag;

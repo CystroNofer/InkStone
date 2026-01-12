@@ -6,50 +6,50 @@ namespace NXTN {
 	{
 		m_Name = "Sandbox Gameplay Layer";
 
-		// Camera
-		m_SceneCamera.reset(new Camera(1.0f, vec2i(windowWidth, windowHeight), false));
-		m_SceneCamera->transform.SetPosition(0.0f, 0.0f, -10.0f);
+		//// Camera
+		//m_SceneCamera.reset(new Camera(1.0f, vec2i(windowWidth, windowHeight), false));
+		//m_SceneCamera->transform.SetPosition(0.0f, 0.0f, -10.0f);
 
 		m_FrameBuffer.reset(FrameBuffer::Create(windowWidth, windowHeight));
 
-		// Temporary draw data
-		// Vertex buffer
-		// 1 3
-		// 0 2
-		float vertices[20] = {
-			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f
-		};
+		//// Temporary draw data
+		//// Vertex buffer
+		//// 1 3
+		//// 0 2
+		//float vertices[20] = {
+		//	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+		//	-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+		//	 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+		//	 0.5f,  0.5f, 0.0f, 1.0f, 1.0f
+		//};
 
-		// Vertex array layout
-		VertexArrayLayout layout({
-			{VertexDataType::Float, 3, "Vertex Position"},
-			{VertexDataType::Float, 2, "Texture Coordinate"}
-			});
+		//// Vertex array layout
+		//VertexArrayLayout layout({
+		//	{VertexDataType::Float, 3, "Vertex Position"},
+		//	{VertexDataType::Float, 2, "Texture Coordinate"}
+		//	});
 
-		// Index buffer
-		unsigned int indices[6] = {
-			0, 1, 3,
-			0, 3, 2
-		};
+		//// Index buffer
+		//unsigned int indices[6] = {
+		//	0, 1, 3,
+		//	0, 3, 2
+		//};
 
-		// Shader
-		m_Shader.reset(Shader::Create("Asset/Shader/Texture.glsl"));
-		// Texture
-		m_Texture.reset(Texture2D::Create("Asset/Texture/Logo.png"));
+		//// Shader
+		//m_Shader.reset(Shader::Create("Asset/Shader/Texture.glsl"));
+		//// Texture
+		//m_Texture.reset(Texture2D::Create("Asset/Texture/Logo.png"));
 
-		// Scene
+		//// Scene
 		m_TestScene.reset(new Scene());
-		m_TestScene->AddObject(new GameObject(
-			"Test Object",
-			new Mesh(
-				VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
-				IndexBuffer::Create(indices, 6)
-			),
-			m_Shader.get()
-		));
+		//m_TestScene->AddObject(new GameObject(
+		//	"Test Object",
+		//	new Mesh(
+		//		VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
+		//		IndexBuffer::Create(indices, 6)
+		//	),
+		//	m_Shader.get()
+		//));
 
 		// UI config
 		// Create dockspace
@@ -80,12 +80,12 @@ namespace NXTN {
 
 		Renderer::ClearFrameBuffer();
 
-		Renderer::SetVPMatrix(m_SceneCamera->GetViewProjMatrix());
+		//Renderer::SetVPMatrix(m_SceneCamera->GetViewProjMatrix());
 
-		m_Texture->Bind(0);
-		m_Shader->SetUniformInt("u_MainTex", 0);
+		//m_Texture->Bind(0);
+		//m_Shader->SetUniformInt("u_MainTex", 0);
 
-		m_TestScene->Update();
+		//m_TestScene->Update();
 
 		m_FrameBuffer->Unbind();
 	}
@@ -128,7 +128,7 @@ namespace NXTN {
 					{
 						m_ViewportSize = viewportSize;
 						Renderer::ResizeViewport((int)m_ViewportSize.x, (int)m_ViewportSize.y);  // OpenGL viewport
-						m_SceneCamera->ResizeViewport((int)m_ViewportSize.x, (int)m_ViewportSize.y);  // Camera aspect ratio
+						//m_SceneCamera->ResizeViewport((int)m_ViewportSize.x, (int)m_ViewportSize.y);  // Camera aspect ratio
 						m_FrameBuffer->Resize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);  // Frame buffer size
 					}
 				}
@@ -150,7 +150,7 @@ namespace NXTN {
 
 				ImGui::Separator();
 
-				DrawHierarchy(m_TestScene->AllObjects());
+				//DrawHierarchy(m_TestScene->AllObjects());
 			}
 			ImGui::End();
 		}
@@ -166,19 +166,19 @@ namespace NXTN {
 		return false;
 	}
 
-	void EditorLayer::DrawHierarchy(const std::vector<std::unique_ptr<GameObject>>& gameObjects)
-	{
-		for (const std::unique_ptr<GameObject>& gameObj : gameObjects)
-		{
-			//if (ImGui::TreeNode(gameObj->GetName().c_str()))
-			//{
-			//	DrawHierarchy(gameObj->GetChildren());
-			//	// TODO: List components and/or other information
-			//	ImGui::TreePop();
-			//}
-			ImGui::Text(gameObj->GetName().c_str());
-		}
-	}
+	//void EditorLayer::DrawHierarchy(const std::vector<std::unique_ptr<GameObject>>& gameObjects)
+	//{
+	//	for (const std::unique_ptr<GameObject>& gameObj : gameObjects)
+	//	{
+	//		//if (ImGui::TreeNode(gameObj->GetName().c_str()))
+	//		//{
+	//		//	DrawHierarchy(gameObj->GetChildren());
+	//		//	// TODO: List components and/or other information
+	//		//	ImGui::TreePop();
+	//		//}
+	//		ImGui::Text(gameObj->GetName().c_str());
+	//	}
+	//}
 
 	// Sandbox Application
 	InkStoneEditor::InkStoneEditor()
