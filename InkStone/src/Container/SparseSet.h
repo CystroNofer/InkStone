@@ -12,7 +12,11 @@ namespace NXTN {
 		SparseSet() {}
 		virtual ~SparseSet() {}
 
-		bool Has(uint32_t key) {
+		constexpr size_t Size() const {
+			return m_DenseKey.size();
+		}
+
+		bool Has(uint32_t key) const {
 			if (key < m_Sparse.size()) {
 				return m_Sparse[key] < SIZE_MAX;
 			}
@@ -47,7 +51,7 @@ namespace NXTN {
 				}
 				// Update
 				else {
-					m_Dense_data[m_Sparse[key]] = std::move(data);
+					m_DenseData[m_Sparse[key]] = std::move(data);
 				}
 			}
 			// Add
