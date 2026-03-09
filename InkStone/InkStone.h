@@ -12,14 +12,13 @@
 #include "src/Event/KeyEvent.h"
 #include "src/Event/MouseEvent.h"
 
-#include "src/Hierarchy/Component.h"
+#include "src/ECS/Component.h"
 //#include "src/Hierarchy/Component/MeshRenderer.h"
 //#include "src/Hierarchy/Component/Transform.h"
-
 //#include "src/Hierarchy/Entity/Camera.h"
-#include "src/Hierarchy/Entity.h"
-
-#include "src/Hierarchy/Scene.h"
+#include "src/ECS/Entity.h"
+#include "src/ECS/Registry.h"
+#include "src/ECS/Scene.h"
 
 #include "src/Math/Math.h"
 

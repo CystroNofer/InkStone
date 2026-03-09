@@ -9,6 +9,7 @@
 #include <chrono>
 #include <cstdio>
 #include <ctime>
+#include <concepts>
 #include <functional>
 #include <fstream>
 #include <iostream>
@@ -20,6 +21,7 @@
 #include <utility>
 
 // Data structure
+#include <array>
 #include <deque>
 #include <string>
 #include <unordered_map>
