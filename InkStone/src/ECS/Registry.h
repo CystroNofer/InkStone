@@ -44,9 +44,9 @@ namespace NXTN {
 			requires (IsComponentCallback<F, Cs...> && UniqueComponent<Cs...>::value)
 		void Each(F callback) {
 			// Retrieve storages
-			size_t kCs = sizeof...(Cs);
+			constexpr size_t kCs = sizeof...(Cs);
 
-			std::tuple<ComponentStorage<Cs>*> compStorages = { TryGetStorage<Cs>()... };
+			std::tuple<ComponentStorage<Cs>*...> compStorages = { TryGetStorage<Cs>()... };
 			std::array<IComponentStorage*, kCs> iCompStorages = {
 				static_cast<IComponentStorage*>(std::get<ComponentStorage<Cs>*>(compStorages))...
 			};
@@ -56,6 +56,7 @@ namespace NXTN {
 			size_t driverStorageIdx = 0;
 			for (size_t i = 0; i < kCs; i++) {
 				if (iCompStorages[i] == nullptr) {
+					// Missing is expected, consider skip warnings
 					std::string names;
 					((names += typeid(Cs).name(), names += ' '), ...);
 					Log::Warning("No entity has component(s) of type(s) %s\n", names.c_str());
@@ -74,7 +75,7 @@ namespace NXTN {
 				}
 
 				if (has) {
-					F(k, std::get<ComponentStorage<Cs>*>(compStorages)->Get(k)...);
+					callback(k, std::get<ComponentStorage<Cs>*>(compStorages)->Get(k)...);
 				}
 			}
 		}

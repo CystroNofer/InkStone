@@ -48,7 +48,7 @@ namespace NXTN {
 
 	template <typename C>
 		requires (IsComponent<C>)
-	class ComponentStorage final : IComponentStorage {
+	class ComponentStorage final : public IComponentStorage {
 	public:
 		virtual size_t Size() const noexcept override {
 			return m_Set.Size();
