@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Scene.h"
+#include "src/Container/SparseSet.h"
+#include "Scene.h"  // Contains E and C
 
 namespace NXTN {
 	// Callback constraint for Each()
 	template <typename F, typename... Cs>
 	concept IsComponentCallback =
-		(IsComponent<Cs> && ...) && std::invocable<F&, EntityID&, Cs&...>;
+		(IsComponent<Cs> && ...) && std::invocable<F&, EntityID, Cs&...>;
 
 	// Ensure not duplicated component types in combination
 	template <typename...>
@@ -15,10 +16,43 @@ namespace NXTN {
 	template <typename C, typename... Rest>
 	struct UniqueComponent<C, Rest...> : std::bool_constant<((!std::is_same_v<C, Rest>) && ...) && UniqueComponent<Rest...>::value> {};
 
+	template <typename C>
+		requires (IsComponent<C>)
+	class ComponentStorage final : public IComponentStorage {
+	public:
+		virtual size_t Size() const noexcept override {
+			return m_Set.Size();
+		}
+
+		virtual bool Has(EntityID eid) const override {
+			return m_Set.Has(eid);
+		}
+
+		C& Get(EntityID eid) {
+			return m_Set.Get(eid);
+		}
+
+		virtual void Add(EntityID eid) override {
+			m_Set.Add(eid);
+		}
+
+		virtual void Remove(EntityID eid) override {
+
+		}
+
+		virtual const std::vector<uint32_t>& Keys() const override {
+			return m_Set.Keys();
+		}
+
+	private:
+		SparseSet<C> m_Set;
+	};
+
 	// Non-singleton design for future proof
 	// Static destruction can potentially cause bugs
 	class Registry
 	{
+	public:
 		Registry();
 		~Registry();
 
@@ -40,9 +74,9 @@ namespace NXTN {
 			m_Components[cid]->Add(e.id);
 		}
 
-		template <typename F, typename... Cs>
+		template <typename... Cs, typename F>
 			requires (IsComponentCallback<F, Cs...> && UniqueComponent<Cs...>::value)
-		void Each(F callback) {
+		void Each(F&& callback) {
 			// Retrieve storages
 			constexpr size_t kCs = sizeof...(Cs);
 
@@ -56,10 +90,10 @@ namespace NXTN {
 			size_t driverStorageIdx = 0;
 			for (size_t i = 0; i < kCs; i++) {
 				if (iCompStorages[i] == nullptr) {
-					// Missing is expected, consider skip warnings
-					std::string names;
-					((names += typeid(Cs).name(), names += ' '), ...);
-					Log::Warning("No entity has component(s) of type(s) %s\n", names.c_str());
+					//// Missing is expected, consider skip warnings
+					//std::string names;
+					//((names += typeid(Cs).name(), names += ' '), ...);
+					//Log::Warning("No entity has component(s) of type(s) %s\n", names.c_str());
 					return;
 				}
 				if (iCompStorages[i]->Size() < driverStorageSize) {

@@ -1,10 +1,10 @@
 #pragma once
 
+#include <cassert>
 #include <concepts>
 
-#include "src/Container/SparseSet.h"
+#include "src/Math/Math.h"
 #include "Entity.h"
-#include "src/Log.h"
 
 namespace NXTN {
 	// Types and constants
@@ -13,18 +13,8 @@ namespace NXTN {
 	constexpr ComponentID COMPONENT_ID_MAX = UINT32_MAX;
 
 	class BaseComponent {
-		friend ComponentID ComponentIDOf();
-
 	protected:
 		virtual ~BaseComponent() = default;
-
-	private:
-		// For component to type ID mapping
-		static inline ComponentID AllocateComponentID() {
-			static ComponentID s_NextCID = 0;
-			if (s_NextCID < COMPONENT_ID_MAX) return ++s_NextCID;
-			Log::Warning("COMPONENT_ID_MAX exceeded");
-		}
 	};
 
 	template <typename C>
@@ -33,7 +23,7 @@ namespace NXTN {
 		BaseComponent
 	>;
 
-	// Sparse set wrappers    
+	// Sparse set wrappers
 	class IComponentStorage {
 	public:
 		virtual ~IComponentStorage() {}
@@ -46,42 +36,19 @@ namespace NXTN {
 	private:
 	};
 
-	template <typename C>
-		requires (IsComponent<C>)
-	class ComponentStorage final : public IComponentStorage {
-	public:
-		virtual size_t Size() const noexcept override {
-			return m_Set.Size();
+	// For component to type ID mapping
+	namespace detail {
+		inline ComponentID AllocateComponentID() {
+			static ComponentID s_NextCID = 0;
+			assert(s_NextCID < COMPONENT_ID_MAX && "COMPONENT_ID_MAX exceeded");
+			return ++s_NextCID;
 		}
-
-		virtual bool Has(EntityID eid) const override {
-			return m_Set.Has(eid);
-		}
-
-		C& Get(EntityID eid) {
-			return m_Set->Get(eid);
-		}
-
-		virtual void Add(EntityID eid) override {
-			m_Set.Add(eid);
-		}
-
-		virtual void Remove(EntityID eid) override {
-
-		}
-
-		virtual const std::vector<uint32_t>& Keys() const override {
-			return m_Set.Keys();
-		}
-
-	private:
-		SparseSet<C> m_Set;
-	};
+	}
 
 	template <typename C>
 		requires (IsComponent<C>)
 	ComponentID ComponentIDOf() {
-		static ComponentID cid = BaseComponent::AllocateComponentID();
+		static ComponentID cid = detail::AllocateComponentID();
 		return cid;
 	}
 }
