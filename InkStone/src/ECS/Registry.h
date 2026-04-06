@@ -57,11 +57,12 @@ namespace NXTN {
 		~Registry();
 
 		EntityID NewEntity();
+
 		void DestroyEntity(Entity& e);
 
 		template <typename C>
 			requires (IsComponent<C>)
-		void AddComponent(Entity& e) {
+		void AddComponent(EntityID& eid) {
 			ComponentID cid = ComponentIDOf<C>();
 
 			if (cid >= m_Components.size()) {
@@ -71,7 +72,7 @@ namespace NXTN {
 			else if (m_Components[cid] == nullptr) {
 				m_Components[cid].reset(new ComponentStorage<C>);
 			}
-			m_Components[cid]->Add(e.id);
+			m_Components[cid]->Add(eid);
 		}
 
 		template <typename... Cs, typename F>
