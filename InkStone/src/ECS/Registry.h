@@ -35,6 +35,11 @@ namespace NXTN {
 		virtual void Add(EntityID eid) override {
 			m_Set.Add(eid);
 		}
+		
+		template <typename... Args>
+		virtual void Emplace(EntityID eid, Args&&... args) override {
+			m_Set.Emplace(eid, std::forward<Args>(args)...);
+		}
 
 		virtual void Remove(EntityID eid) override {
 
@@ -62,7 +67,7 @@ namespace NXTN {
 
 		template <typename C>
 			requires (IsComponent<C>)
-		void AddComponent(EntityID& eid) {
+		void AddComponent(EntityID eid) {
 			ComponentID cid = ComponentIDOf<C>();
 
 			if (cid >= m_Components.size()) {
@@ -73,6 +78,21 @@ namespace NXTN {
 				m_Components[cid].reset(new ComponentStorage<C>);
 			}
 			m_Components[cid]->Add(eid);
+		}
+
+		template <typename C, typename... Args>
+			requires (IsComponent<C>)
+		void AddComponent(EntityID eid, Args&&... args) {
+			ComponentID cid = ComponentIDOf<C>();
+
+			if (cid >= m_Components.size()) {
+				m_Components.resize(cid + 1);
+				m_Components[cid].reset(new ComponentStorage<C>);
+			}
+			else if (m_Components[cid] == nullptr) {
+				m_Components[cid].reset(new ComponentStorage<C>);
+			}
+			m_Components[cid]->Emplace(eid, std::forward<Args>(args)...);
 		}
 
 		template <typename... Cs, typename F>

@@ -50,6 +50,22 @@ namespace NXTN {
 			return true;
 		}
 
+		template <typename... Args>
+		bool Emplace(uint32_t key, Args&&... args) {
+
+			if (Has(key)) {
+				return false;
+			}
+			if (key >= m_Sparse.size()) {
+				m_Sparse.resize(static_cast<size_t>(key) + 1, SIZE_MAX);
+			}
+			m_Sparse[key] = m_DenseKey.size();
+			m_DenseKey.push_back(key);
+			m_DenseData.emplace_back(std::forward<Args>(args)...);
+
+			return true;
+		}
+
 		void Update(uint32_t key, const T& data) {
 			if (key < m_Sparse.size()) {
 				// Add
