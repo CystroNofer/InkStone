@@ -16,6 +16,19 @@ namespace NXTN {
 	template <typename C, typename... Rest>
 	struct UniqueComponent<C, Rest...> : std::bool_constant<((!std::is_same_v<C, Rest>) && ...) && UniqueComponent<Rest...>::value> {};
 
+	// Sparse set wrappers
+	class IComponentStorage {
+	public:
+		virtual ~IComponentStorage() {}
+		virtual size_t Size() const noexcept = 0;
+		virtual bool Has(EntityID eid) const = 0;
+		virtual void Add(EntityID eid) = 0;
+		virtual void Remove(EntityID eid) = 0;
+		virtual const std::vector<uint32_t>& Keys() const = 0;
+
+	private:
+	};
+
 	template <typename C>
 		requires (IsComponent<C>)
 	class ComponentStorage final : public IComponentStorage {
@@ -35,9 +48,9 @@ namespace NXTN {
 		virtual void Add(EntityID eid) override {
 			m_Set.Add(eid);
 		}
-		
+
 		template <typename... Args>
-		virtual void Emplace(EntityID eid, Args&&... args) override {
+		void Emplace(EntityID eid, Args&&... args) {
 			m_Set.Emplace(eid, std::forward<Args>(args)...);
 		}
 
@@ -92,7 +105,7 @@ namespace NXTN {
 			else if (m_Components[cid] == nullptr) {
 				m_Components[cid].reset(new ComponentStorage<C>);
 			}
-			m_Components[cid]->Emplace(eid, std::forward<Args>(args)...);
+			static_cast<ComponentStorage<C>*>(m_Components[cid].get())->Emplace(eid, std::forward<Args>(args)...);
 		}
 
 		template <typename... Cs, typename F>

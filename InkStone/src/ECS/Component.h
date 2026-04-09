@@ -23,19 +23,6 @@ namespace NXTN {
 		BaseComponent
 	>;
 
-	// Sparse set wrappers
-	class IComponentStorage {
-	public:
-		virtual ~IComponentStorage() {}
-		virtual size_t Size() const noexcept = 0;
-		virtual bool Has(EntityID eid) const = 0;
-		virtual void Add(EntityID eid) = 0;
-		virtual void Remove(EntityID eid) = 0;
-		virtual const std::vector<uint32_t>& Keys() const = 0;
-
-	private:
-	};
-
 	// For component to type ID mapping
 	namespace detail {
 		inline ComponentID AllocateComponentID() {
