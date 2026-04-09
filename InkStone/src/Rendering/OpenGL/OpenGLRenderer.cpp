@@ -13,7 +13,15 @@ namespace NXTN {
 
 	void OpenGLRenderer::SetVPMatrixImpl(const mat4& vpMatrix)
 	{
-		m_VPMatrix = vpMatrix;
+		// NDC correction from [0, 1] to [-1, 1]
+		mat4 ndcCorrection(
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 2.0f, -1.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+		);
+
+		m_VPMatrix = mul(ndcCorrection, vpMatrix);
 	}
 
 	void OpenGLRenderer::DrawMeshImpl(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<Shader>& shader, const mat4& mMatrix)

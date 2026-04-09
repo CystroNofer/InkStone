@@ -1,0 +1,12 @@
+# Rendering Math Conventions
+- Vector convention: column vectors
+- Transform application: v_clip = P * V * M * v_local
+- World handedness: left-handed
+- Camera/view space handedness: left-handed
+- Camera forward in view space: +Z
+- NDC X Y range: [-1, 1]
+- NDC Z range: [0, 1]
+- UV origin: bottom-left
+- UV +U direction: right
+- UV +V direction: up
+- Front-face winding: left-handed cross product as normal

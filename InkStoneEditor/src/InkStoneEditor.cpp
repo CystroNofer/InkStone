@@ -6,42 +6,57 @@ namespace NXTN {
 	{
 		m_Name = "Sandbox Gameplay Layer";
 
-		//// Camera
-		//m_SceneCamera.reset(new Camera(1.0f, vec2i(windowWidth, windowHeight), false));
+		// Camera
+		m_SceneCamera.reset(new Camera(true, 1.0f, windowWidth / (float)windowHeight, 0.01f, 100.0f));
+		m_SceneCameraTransform.reset(new Transform());
+		m_SceneCameraTransform->position = vec3(0.0f, 0.0f, -10.0f);
 		//m_SceneCamera->transform.SetPosition(0.0f, 0.0f, -10.0f);
 
 		m_FrameBuffer.reset(FrameBuffer::Create(windowWidth, windowHeight));
 
-		//// Temporary draw data
-		//// Vertex buffer
-		//// 1 3
-		//// 0 2
-		//float vertices[20] = {
-		//	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-		//	-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
-		//	 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-		//	 0.5f,  0.5f, 0.0f, 1.0f, 1.0f
-		//};
+		// Temporary draw data
+		// Vertex buffer
+		// 1 3
+		// 0 2
+		float vertices[20] = {
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f
+		};
 
-		//// Vertex array layout
-		//VertexArrayLayout layout({
-		//	{VertexDataType::Float, 3, "Vertex Position"},
-		//	{VertexDataType::Float, 2, "Texture Coordinate"}
-		//	});
+		// Vertex array layout
+		VertexArrayLayout layout({
+			{VertexDataType::Float, 3, "Vertex Position"},
+			{VertexDataType::Float, 2, "Texture Coordinate"}
+			});
 
-		//// Index buffer
-		//unsigned int indices[6] = {
-		//	0, 1, 3,
-		//	0, 3, 2
-		//};
+		// Index buffer
+		unsigned int indices[6] = {
+			0, 1, 3,
+			0, 3, 2
+		};
 
-		//// Shader
-		//m_Shader.reset(Shader::Create("Asset/Shader/Texture.glsl"));
-		//// Texture
-		//m_Texture.reset(Texture2D::Create("Asset/Texture/Logo.png"));
+		// Shader
+		m_Shader.reset(Shader::Create("Asset/Shader/Texture.glsl"));
+		// Texture
+		m_Texture.reset(Texture2D::Create("Asset/Texture/uv_map_rg_bottom_left_1024.png"));
 
 		//// Scene
-		m_TestScene.reset(new Scene());
+		m_Registry.reset(new Registry());
+		EntityID id = m_Registry->NewEntity();
+		m_Registry->AddComponent<Transform>(id);
+		m_Registry->AddComponent<Renderable, Mesh*, Shader*>(
+			id,
+			new Mesh(
+				VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
+				IndexBuffer::Create(indices, 6)
+			),
+			m_Shader.get()
+		);
+
+		m_SceneRenderer.reset(new SceneRenderer());
+		//m_TestScene.reset(new Scene());
 		//m_TestScene->AddObject(new GameObject(
 		//	"Test Object",
 		//	new Mesh(
@@ -82,8 +97,10 @@ namespace NXTN {
 
 		//Renderer::SetVPMatrix(m_SceneCamera->GetViewProjMatrix());
 
-		//m_Texture->Bind(0);
-		//m_Shader->SetUniformInt("u_MainTex", 0);
+		m_Texture->Bind(0);
+		m_Shader->SetUniformInt("u_MainTex", 0);
+
+		m_SceneRenderer->Run(m_Registry, m_SceneCameraTransform, m_SceneCamera);
 
 		//m_TestScene->Update();
 
@@ -128,7 +145,7 @@ namespace NXTN {
 					{
 						m_ViewportSize = viewportSize;
 						Renderer::ResizeViewport((int)m_ViewportSize.x, (int)m_ViewportSize.y);  // OpenGL viewport
-						//m_SceneCamera->ResizeViewport((int)m_ViewportSize.x, (int)m_ViewportSize.y);  // Camera aspect ratio
+						m_SceneCamera->ResizeViewport(1.0f, m_ViewportSize.x / m_ViewportSize.y);  // Camera aspect ratio
 						m_FrameBuffer->Resize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);  // Frame buffer size
 					}
 				}

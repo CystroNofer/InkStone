@@ -21,11 +21,15 @@ namespace NXTN {
 		//void DrawEntities(const std::vector<std::unique_ptr<Entity>>& entities);
 
 	private:
-		//std::shared_ptr<Camera> m_SceneCamera;
+		std::shared_ptr<Camera> m_SceneCamera;
+		std::shared_ptr<Transform> m_SceneCameraTransform;
 		std::shared_ptr<FrameBuffer> m_FrameBuffer;
-		std::shared_ptr<Scene> m_TestScene;
-		//std::shared_ptr<Texture2D> m_Texture;
-		//std::shared_ptr<Shader> m_Shader;
+		//std::shared_ptr<Scene> m_TestScene;
+		std::shared_ptr<Texture2D> m_Texture;
+		std::shared_ptr<Shader> m_Shader;
+
+		std::unique_ptr<Registry> m_Registry;
+		std::unique_ptr<SceneRenderer> m_SceneRenderer;
 
 		ImGuiID m_DockspaceID;
 		ImGuiWindowFlags m_DockSpaceFlag;

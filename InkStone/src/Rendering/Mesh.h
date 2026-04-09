@@ -21,4 +21,3 @@ namespace NXTN {
 		const std::unique_ptr<IndexBuffer> m_IndexBuffer;
 	};
 }
-
