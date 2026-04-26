@@ -1,2 +1,2 @@
-call dependencies\premake\premake5.exe vs2022
+call dependency\premake\premake5.exe vs2022
 PAUSE

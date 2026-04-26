@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="external">
+      <UniqueIdentifier>{2839F3DC-1406-4EE8-3D1F-3C90294B8376}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\stb_image">
+      <UniqueIdentifier>{C27B45E0-AE5F-0636-17C0-008903C3F0B7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Container">
+      <UniqueIdentifier>{3F0F2748-ABCF-A27E-740A-ECFBE089E75A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Debug">
+      <UniqueIdentifier>{63A3C3B2-CF0D-7829-184C-29CF84F5557E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ECS">
+      <UniqueIdentifier>{F76D2FA9-634D-AE44-6C65-391BD8C314A6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Event">
+      <UniqueIdentifier>{3E1ADFB2-AA84-9329-F3C2-44CF5F6C717E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Gameplay">
+      <UniqueIdentifier>{CC96E562-B8F9-7407-617F-ADBD4DC1408A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Gameplay\Component">
+      <UniqueIdentifier>{2E5E2B1C-1A58-546E-03C5-EA7EEF5DBADA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Gameplay\System">
+      <UniqueIdentifier>{606CD252-CCCD-AF60-553B-F612C19BE61F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Input">
+      <UniqueIdentifier>{EC4823B3-58B3-D729-A1F1-88CF0D9BB57E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Input\GLFW">
+      <UniqueIdentifier>{AB776C3E-9745-6044-80D9-D06A6C463CA9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Math">
+      <UniqueIdentifier>{261422CF-12E1-7CDA-3BFA-6A822726B268}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Rendering">
+      <UniqueIdentifier>{BA10DABB-26D1-55F2-EF0B-9F6F5B8B9ACE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Rendering\OpenGL">
+      <UniqueIdentifier>{AE64194A-9AF3-A213-4312-B70E2F80B3B9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Resource">
+      <UniqueIdentifier>{E46F59CC-D0D2-E870-7958-2127659AB4F3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\UI">
+      <UniqueIdentifier>{3A4B661C-26ED-90F2-0FA8-A446FBE81743}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\UI\OpenGL">
+      <UniqueIdentifier>{2ECF4A20-9A8F-C656-63CA-0FD4CF490B33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\UI\OpenGL\ImGuiBackend">
+      <UniqueIdentifier>{403DD1B1-2C4D-7D82-9506-E2A081356C1B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Window">
+      <UniqueIdentifier>{74C3D837-607B-1A85-C982-F3E0B559B575}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Window\OpenGL">
+      <UniqueIdentifier>{2882300A-9498-2EA0-DD0F-BAC14965FF27}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\external\stb_image\stb_image.h">
+      <Filter>external\stb_image</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Application.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Container\SparseSet.h">
+      <Filter>src\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Debug\Profiler.h">
+      <Filter>src\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\Component.h">
+      <Filter>src\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\ECSSystem.h">
+      <Filter>src\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\Entity.h">
+      <Filter>src\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\Registry.h">
+      <Filter>src\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\Scene.h">
+      <Filter>src\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Event\ApplicationEvent.h">
+      <Filter>src\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Event\Event.h">
+      <Filter>src\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Event\EventBuffer.h">
+      <Filter>src\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Event\KeyEvent.h">
+      <Filter>src\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Event\MouseEvent.h">
+      <Filter>src\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gameplay\Component\Camera.h">
+      <Filter>src\Gameplay\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gameplay\Component\Renderable.h">
+      <Filter>src\Gameplay\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gameplay\Component\Transform.h">
+      <Filter>src\Gameplay\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gameplay\System\SceneRenderer.h">
+      <Filter>src\Gameplay\System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input\GLFW\GLFWInput.h">
+      <Filter>src\Input\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input\GLFW\GLFWKeyMap.h">
+      <Filter>src\Input\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input\Input.h">
+      <Filter>src\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input\KeyCode.h">
+      <Filter>src\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Layer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LayerStack.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Log.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Math\Math.h">
+      <Filter>src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Math\Matrix.h">
+      <Filter>src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Math\Quaternion.h">
+      <Filter>src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Math\Vector.h">
+      <Filter>src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\FrameBuffer.h">
+      <Filter>src\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Mesh.h">
+      <Filter>src\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\OpenGL\OpenGLDataBuffer.h">
+      <Filter>src\Rendering\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\OpenGL\OpenGLFrameBuffer.h">
+      <Filter>src\Rendering\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\OpenGL\OpenGLRenderer.h">
+      <Filter>src\Rendering\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\OpenGL\OpenGLShader.h">
+      <Filter>src\Rendering\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\OpenGL\OpenGLTexture.h">
+      <Filter>src\Rendering\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\OpenGL\OpenGLVertexArray.h">
+      <Filter>src\Rendering\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Renderer.h">
+      <Filter>src\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\RenderingDataBuffer.h">
+      <Filter>src\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Shader.h">
+      <Filter>src\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Texture.h">
+      <Filter>src\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\VertexArray.h">
+      <Filter>src\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Resource\ResourceManager.h">
+      <Filter>src\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="src\APISetting.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EngineTime.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\OpenGL\ImGuiBackend\imgui_impl_glfw.h">
+      <Filter>src\UI\OpenGL\ImGuiBackend</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\OpenGL\ImGuiBackend\imgui_impl_opengl3.h">
+      <Filter>src\UI\OpenGL\ImGuiBackend</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\OpenGL\ImGuiBackend\imgui_impl_opengl3_loader.h">
+      <Filter>src\UI\OpenGL\ImGuiBackend</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\OpenGL\OpenGLUI.h">
+      <Filter>src\UI\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\UI.h">
+      <Filter>src\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\OpenGL\OpenGLWindow.h">
+      <Filter>src\Window\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Window.h">
+      <Filter>src\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pch.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\external\stb_image\stb_image.cpp">
+      <Filter>external\stb_image</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ECS\Registry.cpp">
+      <Filter>src\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ECS\Scene.cpp">
+      <Filter>src\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Event\EventBuffer.cpp">
+      <Filter>src\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gameplay\Component\Camera.cpp">
+      <Filter>src\Gameplay\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gameplay\Component\Renderable.cpp">
+      <Filter>src\Gameplay\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gameplay\Component\Transform.cpp">
+      <Filter>src\Gameplay\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gameplay\System\SceneRenderer.cpp">
+      <Filter>src\Gameplay\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\GLFW\GLFWInput.cpp">
+      <Filter>src\Input\GLFW</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Input.cpp">
+      <Filter>src\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LayerStack.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Log.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Math\Matrix.cpp">
+      <Filter>src\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Math\Quaternion.cpp">
+      <Filter>src\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Math\Vector.cpp">
+      <Filter>src\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\FrameBuffer.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Mesh.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\OpenGL\OpenGLDataBuffer.cpp">
+      <Filter>src\Rendering\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\OpenGL\OpenGLFrameBuffer.cpp">
+      <Filter>src\Rendering\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\OpenGL\OpenGLRenderer.cpp">
+      <Filter>src\Rendering\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\OpenGL\OpenGLShader.cpp">
+      <Filter>src\Rendering\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\OpenGL\OpenGLTexture.cpp">
+      <Filter>src\Rendering\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\OpenGL\OpenGLVertexArray.cpp">
+      <Filter>src\Rendering\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Renderer.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\RenderingDataBuffer.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Shader.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Texture.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\VertexArray.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\APISetting.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EngineTime.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\OpenGL\ImGuiBackend\imgui_impl_glfw.cpp">
+      <Filter>src\UI\OpenGL\ImGuiBackend</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\OpenGL\ImGuiBackend\imgui_impl_opengl3.cpp">
+      <Filter>src\UI\OpenGL\ImGuiBackend</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\OpenGL\OpenGLUI.cpp">
+      <Filter>src\UI\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\UI.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\OpenGL\OpenGLWindow.cpp">
+      <Filter>src\Window\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\Window.cpp">
+      <Filter>src\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pch.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

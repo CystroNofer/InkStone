@@ -1,6 +1,6 @@
 workspace "InkStone"
 	architecture "x64"
-	startproject "Sandbox"
+	startproject "engine"
 
 	configurations{
 		"Debug",
@@ -9,12 +9,13 @@ workspace "InkStone"
 
 outputdir = "%{cfg.architecture}/%{cfg.buildcfg}"
 
-include "InkStone/include/GLAD"
-include "InkStone/include/imgui"
+include "external/GLAD"
+include "external/imgui"
 
-project "InkStone"
-	location "InkStone"
-	kind "StaticLib"
+project "engine"
+	location "engine"
+	-- kind "StaticLib"
+	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"
 	staticruntime "on"
@@ -23,29 +24,25 @@ project "InkStone"
 	objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
 
 	pchheader "pch.h"
-	pchsource "%{prj.name}/pch.cpp"
+	pchsource "%{prj.name}/src/pch.cpp"
 
 	files{
-		"%{prj.name}/%{prj.name}.h",
-		"%{prj.name}/pch.h",
-		"%{prj.name}/pch.cpp",
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
-		"%{prj.name}/include/stb_image/**.h",
-		"%{prj.name}/include/stb_image/**.cpp"
+		"external/stb_image/**.h",
+		"external/stb_image/**.cpp"
 	}
 
 	includedirs{
-		"%{prj.name}",
-		"%{prj.name}/include/EnTT/include",
-		"%{prj.name}/include/GLAD/include",
-		"%{prj.name}/include/GLFW/include",
-		"%{prj.name}/include/imgui/",
-		"%{prj.name}/include/stb_image/"
+		"%{prj.name}/src",
+		"external/GLAD/include",
+		"external/GLFW/include",
+		"external/imgui/",
+		"external/stb_image/"
 	}
 	
 	syslibdirs{
-		"%{prj.name}/include/GLFW/lib"
+		"external/GLFW/lib"
 	}
 
 	links{
@@ -74,79 +71,79 @@ project "InkStone"
 		runtime "Release"
 		optimize "on"
 
-project "InkStoneEditor"
-	location "InkStoneEditor"
-	kind "ConsoleApp"
-	language "C++"
-	cppdialect "C++20"
-	staticruntime "on"
+-- project "InkStoneEditor"
+-- 	location "InkStoneEditor"
+-- 	kind "ConsoleApp"
+-- 	language "C++"
+-- 	cppdialect "C++20"
+-- 	staticruntime "on"
 	
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
+-- 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+-- 	objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
 
-	files{
-		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
-	}
+-- 	files{
+-- 		"%{prj.name}/src/**.h",
+-- 		"%{prj.name}/src/**.cpp"
+-- 	}
 
-	includedirs{
-		"InkStone"
-	}
+-- 	includedirs{
+-- 		"InkStone"
+-- 	}
 
-	links{
-		"InkStone"
-	}
+-- 	links{
+-- 		"InkStone"
+-- 	}
 
-	filter "system:windows"
-		systemversion "latest"
+-- 	filter "system:windows"
+-- 		systemversion "latest"
 
-		defines{
-			"NXTN_PLATFORM_WINDOWS"
-		}
+-- 		defines{
+-- 			"NXTN_PLATFORM_WINDOWS"
+-- 		}
 
-	filter "configurations:Debug"
-		defines "NXTN_DEBUG"
-		symbols "on"
+-- 	filter "configurations:Debug"
+-- 		defines "NXTN_DEBUG"
+-- 		symbols "on"
 
-	filter "configurations:Release"
-		defines "NXTN_RELEASE"
-		optimize "on"
+-- 	filter "configurations:Release"
+-- 		defines "NXTN_RELEASE"
+-- 		optimize "on"
 
-project "Sandbox"
-	location "Sandbox"
-	kind "ConsoleApp"
-	language "C++"
-	cppdialect "C++20"
-	staticruntime "on"
+-- project "Sandbox"
+-- 	location "Sandbox"
+-- 	kind "ConsoleApp"
+-- 	language "C++"
+-- 	cppdialect "C++20"
+-- 	staticruntime "on"
 	
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
+-- 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+-- 	objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
 
-	files{
-		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
-	}
+-- 	files{
+-- 		"%{prj.name}/src/**.h",
+-- 		"%{prj.name}/src/**.cpp"
+-- 	}
 
-	includedirs{
-		"InkStone"
-	}
+-- 	includedirs{
+-- 		"InkStone"
+-- 	}
 
-	links{
-		"InkStone"
-	}
+-- 	links{
+-- 		"InkStone"
+-- 	}
 
-	filter "system:windows"
-		systemversion "latest"
+-- 	filter "system:windows"
+-- 		systemversion "latest"
 
-		defines{
-			"NXTN_PLATFORM_WINDOWS"
-		}
+-- 		defines{
+-- 			"NXTN_PLATFORM_WINDOWS"
+-- 		}
 
-	filter "configurations:Debug"
-		defines "NXTN_DEBUG"
-		symbols "on"
+-- 	filter "configurations:Debug"
+-- 		defines "NXTN_DEBUG"
+-- 		symbols "on"
 
-	filter "configurations:Release"
-		defines "NXTN_RELEASE"
-		optimize "on"
+-- 	filter "configurations:Release"
+-- 		defines "NXTN_RELEASE"
+-- 		optimize "on"
 		
