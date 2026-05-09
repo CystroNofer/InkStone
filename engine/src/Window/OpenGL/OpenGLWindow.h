@@ -9,7 +9,7 @@ namespace NXTN {
 	class OpenGLWindow : public Window
 	{
 	public:
-		OpenGLWindow(std::string title, bool vSync = false);
+		OpenGLWindow(std::string title, bool vSyncOption = false);
 		virtual ~OpenGLWindow();
 
 		virtual void Update() override;

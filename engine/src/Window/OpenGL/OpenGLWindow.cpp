@@ -7,9 +7,9 @@
 namespace NXTN {
 	static bool s_GLFWInitialized = false;
 
-	OpenGLWindow::OpenGLWindow(std::string title, bool vSync)
+	OpenGLWindow::OpenGLWindow(std::string title, bool vSyncOption)
 	{
-		vSync = vSync;
+		m_WinData.vSync = vSyncOption;
 		//EventCallback = [](Event&) {};
 
 		// GLFW initialization
@@ -50,12 +50,11 @@ namespace NXTN {
 		glViewport(0, 0, m_WinData.width, m_WinData.height);
 
 		// Log context information
-		Log::Info("OpenGL context initialized");
-		Log::Info("  ©À- Hardware Info:  %s", glGetString(GL_RENDERER));
-		Log::Info("  ©¸- OpenGL Version: %s", glGetString(GL_VERSION));
+		Log::Info("Hardware:  %s", glGetString(GL_RENDERER));
+		Log::Info("OpenGL Version: %s", glGetString(GL_VERSION));
 
 		// V Sync
-		glfwSwapInterval(vSync ? 1 : 0);
+		glfwSwapInterval(m_WinData.vSync ? 1 : 0);
 
 		// GLFW event callbacks
 		// Window close
