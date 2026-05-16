@@ -120,9 +120,7 @@
     <ClInclude Include="src\Gameplay\Component\Renderable.h" />
     <ClInclude Include="src\Gameplay\Component\Transform.h" />
     <ClInclude Include="src\Gameplay\System\SceneRenderer.h" />
-    <ClInclude Include="src\Input\GLFW\GLFWInput.h" />
     <ClInclude Include="src\Input\GLFW\GLFWKeyMap.h" />
-    <ClInclude Include="src\Input\Input.h" />
     <ClInclude Include="src\Input\KeyCode.h" />
     <ClInclude Include="src\Layer.h" />
     <ClInclude Include="src\LayerStack.h" />
@@ -166,8 +164,6 @@
     <ClCompile Include="src\Gameplay\Component\Renderable.cpp" />
     <ClCompile Include="src\Gameplay\Component\Transform.cpp" />
     <ClCompile Include="src\Gameplay\System\SceneRenderer.cpp" />
-    <ClCompile Include="src\Input\GLFW\GLFWInput.cpp" />
-    <ClCompile Include="src\Input\Input.cpp" />
     <ClCompile Include="src\LayerStack.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\Math\Matrix.cpp" />

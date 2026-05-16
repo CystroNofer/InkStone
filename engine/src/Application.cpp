@@ -116,10 +116,16 @@ namespace NXTN {
 			}
 			case EventType::WindowResized:
 			{
-				WindowResizeEvent e = *(WindowResizeEvent*)(event_ptr);
+				WindowResizeEvent* e = (WindowResizeEvent*)(event_ptr);
 				//Renderer::ResizeViewport(e.GetNewWidth(), e.GetNewHeight());
-				m_Minimized = e.GetNewWidth() < 1 || e.GetNewHeight() < 1;
+				m_Minimized = e->GetNewWidth() < 1 || e->GetNewHeight() < 1;
 				Renderer::ResizeViewport((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
+				break;
+			}
+			case EventType::KeyPressed:
+			{
+				KeyPressEvent* e = (KeyPressEvent*)(event_ptr);
+				Log::Info("Key %d pressed as %d", e->GetKeyCode(), e->GetRepeatCount());
 				break;
 			}
 			}

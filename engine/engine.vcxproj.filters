@@ -129,18 +129,6 @@
     <ClInclude Include="src\Gameplay\System\SceneRenderer.h">
       <Filter>src\Gameplay\System</Filter>
     </ClInclude>
-    <ClInclude Include="src\Input\GLFW\GLFWInput.h">
-      <Filter>src\Input\GLFW</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Input\GLFW\GLFWKeyMap.h">
-      <Filter>src\Input\GLFW</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Input\Input.h">
-      <Filter>src\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Input\KeyCode.h">
-      <Filter>src\Input</Filter>
-    </ClInclude>
     <ClInclude Include="src\Layer.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -228,6 +216,8 @@
     <ClInclude Include="src\pch.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Input\GLFW\GLFWKeyMap.h" />
+    <ClInclude Include="src\Input\KeyCode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\external\stb_image\stb_image.cpp">
@@ -262,12 +252,6 @@
     </ClCompile>
     <ClCompile Include="src\Gameplay\System\SceneRenderer.cpp">
       <Filter>src\Gameplay\System</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Input\GLFW\GLFWInput.cpp">
-      <Filter>src\Input\GLFW</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Input\Input.cpp">
-      <Filter>src\Input</Filter>
     </ClCompile>
     <ClCompile Include="src\LayerStack.cpp">
       <Filter>src</Filter>
