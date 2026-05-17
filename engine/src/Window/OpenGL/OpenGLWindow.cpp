@@ -79,18 +79,18 @@ namespace NXTN {
 			{
 				//WindowData& windowData = *(WindowData*)glfwGetWindowUserPointer(window);
 
-				key = keycodeMapFromGLFW[key];
+				KeyCode k = MapFromGLFWKeyCode(key);
 
 				switch (action)
 				{
 				case GLFW_PRESS:
-					EventBuffer::PushEvent(new KeyPressEvent(key, 0));
+					EventBuffer::PushEvent(new KeyPressEvent(k, 0));
 					break;
 				case GLFW_RELEASE:
-					EventBuffer::PushEvent(new KeyReleaseEvent(key));
+					EventBuffer::PushEvent(new KeyReleaseEvent(k));
 					break;
 				case GLFW_REPEAT:
-					EventBuffer::PushEvent(new KeyPressEvent(key, 1));
+					EventBuffer::PushEvent(new KeyPressEvent(k, 1));
 					break;
 				}
 			}
@@ -100,15 +100,15 @@ namespace NXTN {
 			{
 				//WindowData& windowData = *(WindowData*)glfwGetWindowUserPointer(window);
 
-				key = keycodeMapFromGLFW[key];
+				MouseButtonCode k = MapFromGLFWMouseButton(key);
 
 				switch (action)
 				{
 				case GLFW_PRESS:
-					EventBuffer::PushEvent(new MouseButtonPressEvent(key));
+					EventBuffer::PushEvent(new MouseButtonPressEvent(k));
 					break;
 				case GLFW_RELEASE:
-					EventBuffer::PushEvent(new MouseButtonReleaseEvent(key));
+					EventBuffer::PushEvent(new MouseButtonReleaseEvent(k));
 					break;
 				}
 			}

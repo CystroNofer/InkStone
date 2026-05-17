@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Event.h"
+#include "Input/KeyCode.h"
 
 namespace NXTN {
 	class MouseButtonEvent : public Event
@@ -8,18 +9,18 @@ namespace NXTN {
 	public:
 		virtual EventFlag GetEventFlag() const override { return EventFlag::Mouse; }
 
-		inline int GetButton() const { return m_Button; }
+		inline MouseButtonCode GetButton() const { return m_Button; }
 
 	protected:
-		MouseButtonEvent(int btn) : m_Button(btn) {}
+		MouseButtonEvent(MouseButtonCode btn) : m_Button(btn) {}
 
-		int m_Button;
+		MouseButtonCode m_Button;
 	};
 
 	class MouseButtonPressEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonPressEvent(int btn) : MouseButtonEvent(btn) {};
+		MouseButtonPressEvent(MouseButtonCode btn) : MouseButtonEvent(btn) {};
 
 		virtual EventType GetEventType() const override { return EventType::MouseButtonPressed; }
 	};
@@ -27,7 +28,7 @@ namespace NXTN {
 	class MouseButtonReleaseEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonReleaseEvent(int btn) : MouseButtonEvent(btn) {};
+		MouseButtonReleaseEvent(MouseButtonCode btn) : MouseButtonEvent(btn) {};
 
 		virtual EventType GetEventType() const override { return EventType::MouseButtonReleased; }
 	};

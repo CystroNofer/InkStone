@@ -1,5 +1,164 @@
 #pragma once
 
+#include <cstdint>
+
+namespace NXTN {
+	enum class MouseButtonCode : int32_t
+	{
+		Button0 = 0,   // Left
+		Button1 = 1,   // Right
+		Button2 = 2,   // Middle
+		Button3 = 3,
+		Button4 = 4,
+		Button5 = 5,
+		Button6 = 6,
+
+		Left = Button0,
+		Right = Button1,
+		Middle = Button2
+	};
+
+	enum class KeyCode : int32_t
+	{
+		Unknown = -1,
+
+		// Numbers - Top Row
+		Num0 = 30,
+		Num1 = 31,
+		Num2 = 32,
+		Num3 = 33,
+		Num4 = 34,
+		Num5 = 35,
+		Num6 = 36,
+		Num7 = 37,
+		Num8 = 38,
+		Num9 = 39,
+
+		// Numbers - Keypad
+		Kp0 = 40,
+		Kp1 = 41,
+		Kp2 = 42,
+		Kp3 = 43,
+		Kp4 = 44,
+		Kp5 = 45,
+		Kp6 = 46,
+		Kp7 = 47,
+		Kp8 = 48,
+		Kp9 = 49,
+
+		Space = 50,
+
+		// Special Characters
+		GraveAccent = 51, // ` ~
+		Minus = 52, // - _
+		Equal = 53, // = +
+		LeftBracket = 54, // [ {
+		RightBracket = 55, // ] }
+		Backslash = 56, // \ |
+		Semicolon = 57, // ; :
+		Apostrophe = 58, // ' "
+		Comma = 59, // , <
+		Period = 60, // . >
+		Slash = 61, // / ?
+		World1 = 62, // non-US #1
+		World2 = 63, // non-US #2
+
+		// Letters
+		A = 65,
+		B = 66,
+		C = 67,
+		D = 68,
+		E = 69,
+		F = 70,
+		G = 71,
+		H = 72,
+		I = 73,
+		J = 74,
+		K = 75,
+		L = 76,
+		M = 77,
+		N = 78,
+		O = 79,
+		P = 80,
+		Q = 81,
+		R = 82,
+		S = 83,
+		T = 84,
+		U = 85,
+		V = 86,
+		W = 87,
+		X = 88,
+		Y = 89,
+		Z = 90,
+
+		// Utility Keys
+		Backspace = 110,
+		Tab = 111,
+		Enter = 112,
+		Insert = 113,
+		Delete = 114,
+		Home = 115,
+		End = 116,
+		PageUp = 117,
+		PageDown = 118,
+		Left = 119,
+		Right = 120,
+		Down = 121,
+		Up = 122,
+		Pause = 123,
+		CapsLock = 124,
+		NumLock = 125,
+		ScrollLock = 126,
+		PrintScreen = 127,
+		Escape = 128,
+
+		// Function Keys
+		F1 = 171,
+		F2 = 172,
+		F3 = 173,
+		F4 = 174,
+		F5 = 175,
+		F6 = 176,
+		F7 = 177,
+		F8 = 178,
+		F9 = 179,
+		F10 = 180,
+		F11 = 181,
+		F12 = 182,
+		F13 = 183,
+		F14 = 184,
+		F15 = 185,
+		F16 = 186,
+		F17 = 187,
+		F18 = 188,
+		F19 = 189,
+		F20 = 190,
+		F21 = 191,
+		F22 = 192,
+		F23 = 193,
+		F24 = 194,
+		F25 = 195,
+
+		KpDecimal = 200,
+		KpAdd = 201,
+		KpSubtract = 202,
+		KpMultiply = 203,
+		KpDivide = 204,
+		KpEqual = 205,
+		KpEnter = 206,
+
+		LeftShift = 210,
+		LeftControl = 211,
+		LeftSuper = 212,
+		LeftAlt = 213,
+		RightShift = 214,
+		RightControl = 215,
+		RightSuper = 216,
+		RightAlt = 217,
+		Menu = 218
+	};
+}
+
 /* -------- The Unknown Key ------- */
 #define NXTN_KEY_UNKNOWN            -1
 

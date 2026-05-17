@@ -82,13 +82,13 @@ namespace NXTN {
 			break;
 		case EventType::MouseButtonPressed:
 		{
-			int mouseBtnCode = (*(MouseButtonPressEvent*)event_ptr).GetButton();
+			int mouseBtnCode = (int)(((MouseButtonPressEvent*)event_ptr)->GetButton());
 			io.MouseDown[mouseBtnCode] = true;
 			break;
 		}
 		case EventType::MouseButtonReleased:
 		{
-			int mouseBtnCode = (*(MouseButtonPressEvent*)event_ptr).GetButton();
+			int mouseBtnCode = (int)(((MouseButtonPressEvent*)event_ptr)->GetButton());
 			io.MouseDown[mouseBtnCode] = false;
 			break;
 		}

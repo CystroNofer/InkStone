@@ -1,25 +1,26 @@
 #pragma once
 
 #include "Event.h"
+#include "Input/KeyCode.h"
 
 namespace NXTN {
 	class KeyEvent : public Event
 	{
 	public:
-		inline int GetKeyCode() { return m_KeyCode; }
+		inline KeyCode GetKeyCode() { return m_KeyCode; }
 
 		virtual EventFlag GetEventFlag() const override { return EventFlag::Keyboard; }
 
 	protected:
-		KeyEvent(int keyCode) : m_KeyCode(keyCode) {}
+		KeyEvent(KeyCode keyCode) : m_KeyCode(keyCode) {}
 
-		int m_KeyCode;
+		KeyCode m_KeyCode;
 	};
 
 	class KeyPressEvent : public KeyEvent
 	{
 	public:
-		KeyPressEvent(int keyCode, int repeatCount) : KeyEvent(keyCode), m_RepeatCount(repeatCount) {};
+		KeyPressEvent(KeyCode keyCode, int repeatCount) : KeyEvent(keyCode), m_RepeatCount(repeatCount) {};
 
 		virtual EventType GetEventType() const override { return EventType::KeyPressed; }
 
@@ -32,7 +33,7 @@ namespace NXTN {
 	class KeyReleaseEvent : public KeyEvent
 	{
 	public:
-		KeyReleaseEvent(int keyCode) : KeyEvent(keyCode) {};
+		KeyReleaseEvent(KeyCode keyCode) : KeyEvent(keyCode) {};
 
 		virtual EventType GetEventType() const override { return EventType::KeyReleased; }
 	};
