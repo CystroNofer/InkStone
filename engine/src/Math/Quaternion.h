@@ -3,9 +3,6 @@
 #include "Matrix.h"
 
 namespace NXTN {
-	const long double CONST_PI = 3.14159265358979323846264338327950288419716;
-	const long double CONST_PI_OVER_180 = 0.01745329251994329576923690768489;
-
 	// Angle in radius
 	struct Quaternion
 	{
