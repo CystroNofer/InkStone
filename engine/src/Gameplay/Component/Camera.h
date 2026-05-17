@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ECS/Component.h"
+#include "Math/Math.h"
 
 namespace NXTN {
     class Camera : public BaseComponent

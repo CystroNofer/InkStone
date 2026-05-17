@@ -3,7 +3,6 @@
 #include <cassert>
 #include <concepts>
 
-#include "Math/Math.h"
 #include "Entity.h"
 
 namespace NXTN {

@@ -3,6 +3,7 @@
 #include "ECS/Component.h"
 #include "Rendering/Mesh.h"
 #include "Rendering/Shader.h"
+#include "Math/Math.h"
 
 namespace NXTN {
 	class Renderable : public BaseComponent
