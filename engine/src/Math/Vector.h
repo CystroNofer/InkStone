@@ -5,6 +5,11 @@
 #include <sstream>
 
 namespace NXTN {
+	// Epsilon values are defined here since this is used by all other math modules
+	// Consider moving it elsewhere
+	inline constexpr float EPSILON = 1e-6f;
+	inline constexpr float EPSILON_SQ = 1e-12f;
+
 	struct vec2
 	{
 		float x = 0;

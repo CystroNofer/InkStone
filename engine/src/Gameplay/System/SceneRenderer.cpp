@@ -26,7 +26,7 @@ namespace NXTN {
 		// Look-at origin placeholder V matrix
 		vec3 x, y, z;
 		
-		if (dot(camT->position, camT->position) < 1e-12f) {
+		if (dot(camT->position, camT->position) < EPSILON_SQ) {
 			x = vec3(1.0f, 0.0f, 0.0f);
 			y = vec3(0.0f, 1.0f, 0.0f);
 			z = vec3(0.0f, 0.0f, 1.0f);
@@ -35,7 +35,7 @@ namespace NXTN {
 			z = normalize(-camT->position);  // Look direction
 
 			// Z facing up - X aligns with world X, Y aligns with world -Z
-			if (z.x * z.x + z.z * z.z < 1e-12f) {
+			if (z.x * z.x + z.z * z.z < EPSILON_SQ) {
 				x = vec3(z.y, 0.0f, 0.0f);
 				y = vec3(0.0f, 0.0f, -z.y);
 			}
