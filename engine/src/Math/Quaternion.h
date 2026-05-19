@@ -6,10 +6,10 @@ namespace NXTN {
 	// Angle in radius
 	struct Quaternion
 	{
-		float w, x, y, z;
+		float x, y, z, w;
 
-		inline Quaternion() : w(1), x(0), y(0), z(0) {}
-		inline Quaternion(float w0, float x0, float y0, float z0) : w(w0), x(x0), y(y0), z(z0) {}
+		inline Quaternion() : x(0), y(0), z(0), w(1) {}
+		inline Quaternion(float x0, float y0, float z0, float w0) : x(x0), y(y0), z(z0), w(w0) {}
 		Quaternion(float angle, const vec3& axis);
 		~Quaternion() {}
 

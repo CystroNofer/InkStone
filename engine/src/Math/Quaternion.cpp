@@ -19,7 +19,7 @@ namespace NXTN {
 
 	Quaternion Quaternion::Conjugate()
 	{
-		return Quaternion(w, -x, -y, -z);
+		return Quaternion(-x, -y, -z, w);
 	}
 
 	float Quaternion::Length()
@@ -95,21 +95,21 @@ namespace NXTN {
 
 		if (trace > EPSILON) {
 			float s = 2.0f * std::sqrt(trace + 1);
-			return Quaternion(0.25f * s, (r21 - r12) / s, (r02 - r20) / s, (r10 - r01) / s);
+			return Quaternion((r21 - r12) / s, (r02 - r20) / s, (r10 - r01) / s, 0.25f * s);
 		}
 		if (r00 > r11 && r00 > r22) {
 			float s = 2.0f * std::sqrt(1.0f + r00 - r11 - r22);
-			return Quaternion((r21 - r12) / s, 0.25f * s, (r01 + r10) / s, (r02 + r20) / s);
+			return Quaternion(0.25f * s, (r01 + r10) / s, (r02 + r20) / s, (r21 - r12) / s);
 		}
 		else if (r11 > r22)
 		{
 			float s = 2.0f * std::sqrt(1.0f + r11 - r00 - r22);
-			return Quaternion((r02 - r20) / s, (r01 + r10) / s, 0.25f * s, (r12 + r21) / s);
+			return Quaternion((r01 + r10) / s, 0.25f * s, (r12 + r21) / s, (r02 - r20) / s);
 		}
 		else
 		{
 			float s = 2.0f * std::sqrt(1.0f + r22 - r00 - r11);
-			return Quaternion((r10 - r01) / s, (r02 + r20) / s, (r12 + r21) / s, 0.25f * s);
+			return Quaternion((r02 + r20) / s, (r12 + r21) / s, 0.25f * s, (r10 - r01) / s);
 		}
 	}
 
@@ -141,7 +141,7 @@ namespace NXTN {
 		y = qa.w * qb.y - qa.x * qb.z + qa.y * qb.w + qa.z * qb.x;
 		z = qa.w * qb.z + qa.x * qb.y - qa.y * qb.x + qa.z * qb.w;
 
-		return Quaternion(w, x, y, z);
+		return Quaternion(x, y, z, w);
 	}
 
 	void operator*=(Quaternion& qa, const Quaternion& qb)
