@@ -3,24 +3,6 @@
 #include "Quaternion.h"
 
 namespace NXTN {
-	Quaternion::Quaternion(float w0, float x0, float y0, float z0)
-		: w(w0), x(x0), y(y0), z(z0)
-	{
-		float l = w * w + x * x + y * y + z * z;
-		if (l <= EPSILON_SQ) {
-			w = 1.0f;
-			x = 0.0f;
-			y = 0.0f;
-			z = 0.0f;
-			return;
-		}
-		float invSqrtL = 1.0f / std::sqrt(l);
-		w *= invSqrtL;
-		x *= invSqrtL;
-		y *= invSqrtL;
-		z *= invSqrtL;
-	}
-
 	Quaternion::Quaternion(float angle, const vec3& axis)  // Angle in radius
 	{
 		angle /= 2.0f;
