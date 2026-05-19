@@ -78,6 +78,60 @@ namespace NXTN {
 		);
 	}
 
+	Quaternion Quaternion::FromRotationMatrix(mat4 r)
+	{
+		// The [] operator is not trivial
+		float r00 = r[0][0];
+		float r01 = r[0][1];
+		float r02 = r[0][2];
+		float r10 = r[1][0];
+		float r11 = r[1][1];
+		float r12 = r[1][2];
+		float r20 = r[2][0];
+		float r21 = r[2][1];
+		float r22 = r[2][2];
+
+		float trace = r00 + r11 + r22;
+
+		if (trace > EPSILON) {
+			float s = 2.0f * std::sqrt(trace + 1);
+			return Quaternion(0.25f * s, (r21 - r12) / s, (r02 - r20) / s, (r10 - r01) / s);
+		}
+		if (r00 > r11 && r00 > r22) {
+			float s = 2.0f * std::sqrt(1.0f + r00 - r11 - r22);
+			return Quaternion((r21 - r12) / s, 0.25f * s, (r01 + r10) / s, (r02 + r20) / s);
+		}
+		else if (r11 > r22)
+		{
+			float s = 2.0f * std::sqrt(1.0f + r11 - r00 - r22);
+			return Quaternion((r02 - r20) / s, (r01 + r10) / s, 0.25f * s, (r12 + r21) / s);
+		}
+		else
+		{
+			float s = 2.0f * std::sqrt(1.0f + r22 - r00 - r11);
+			return Quaternion((r10 - r01) / s, (r02 + r20) / s, (r12 + r21) / s, 0.25f * s);
+		}
+	}
+
+	void normalize(Quaternion& q) {
+		float l = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
+
+		if (l < EPSILON_SQ) {
+			q.w = 1.0f;
+			q.x = 0.0f;
+			q.y = 0.0f;
+			q.z = 0.0f;
+			return;
+		}
+		
+		float invSqrtL = 1.0f / std::sqrt(l);
+
+		q.w *= invSqrtL;
+		q.x *= invSqrtL;
+		q.y *= invSqrtL;
+		q.z *= invSqrtL;
+	}
+
 	Quaternion operator*(const Quaternion& qa, const Quaternion& qb)
 	{
 		float w, x, y, z;

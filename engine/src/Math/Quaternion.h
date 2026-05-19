@@ -20,9 +20,12 @@ namespace NXTN {
 		vec3 ApplyRotation(const vec3& vector);
 
 		mat4 GetRotationMatrix();
+		static Quaternion FromRotationMatrix(mat4 r);
 
 		std::string ToString();
 	};
+
+	void normalize(Quaternion& q);
 
 	Quaternion operator*(const Quaternion& qa, const Quaternion& qb);
 	void operator*=(Quaternion& qa, const Quaternion& qb);

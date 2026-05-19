@@ -23,7 +23,7 @@ namespace NXTN {
 
 		inline const float* operator[](int i) const
 		{
-			return &(m_Mat[i][0]);
+			return m_Mat[i];
 		}
 
 		//mat4 Transpose();
