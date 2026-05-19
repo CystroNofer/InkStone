@@ -36,7 +36,7 @@ namespace NXTN {
 
 			// Z facing up - X aligns with world X, Y aligns with world -Z
 			if (z.x * z.x + z.z * z.z < EPSILON_SQ) {
-				x = vec3(z.y, 0.0f, 0.0f);
+				x = vec3(1.0f, 0.0f, 0.0f);
 				y = vec3(0.0f, 0.0f, -z.y);
 			}
 			else {
