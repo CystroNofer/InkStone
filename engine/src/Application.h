@@ -66,6 +66,9 @@ namespace NXTN {
 		std::shared_ptr<Texture2D> m_Texture;
 		Shader* m_Shader;
 
+		float m_CameraAngle = 0;
+		float m_CameraDistance = 10;
+
 		std::unique_ptr<Registry> m_Registry;
 		std::unique_ptr<SceneRenderer> m_SceneRenderer;
 

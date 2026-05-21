@@ -8,7 +8,7 @@ namespace NXTN {
 	Application::Application() : m_Alive(true), m_Minimized(false)
 	{
 		NXTN_PROFILE_NEXT(60);
-		NXTN_PROFILE_FUNCTION()
+		NXTN_PROFILE_FUNCTION();
 
 		Time::InitTime();
 
@@ -42,9 +42,10 @@ namespace NXTN {
 			ImGuiWindowFlags_NoCollapse;
 
 		// Camera
-		m_SceneCamera.reset(new Camera(true, 1.0f, m_Window->GetWidth() / (float)m_Window->GetHeight(), 0.01f, 100.0f));
+		//m_SceneCamera.reset(new Camera(true, 1.0f, m_Window->GetWidth() / (float)m_Window->GetHeight(), 0.01f, 100.0f));
+		m_SceneCamera.reset(new Camera(false, 60.0f, m_Window->GetWidth() / (float)m_Window->GetHeight(), 0.01f, 100.0f));
 		m_SceneCameraTransform.reset(new Transform());
-		m_SceneCameraTransform->position = vec3(0.0f, 0.0f, -10.0f);
+		m_SceneCameraTransform->position = vec3(0.0f, 0.0f, -m_CameraDistance);
 
 		m_FrameBuffer.reset(FrameBuffer::Create(m_Window->GetWidth(), m_Window->GetHeight()));
 
@@ -104,7 +105,7 @@ namespace NXTN {
 
 		// ====================== Event ======================
 		EventBuffer::PushEvent(new ApplicationUpdateEvent());
-
+		
 		for (Event*& event_ptr : EventBuffer::GetEventBuffer())
 		{
 			switch (event_ptr->GetEventType())
@@ -125,8 +126,38 @@ namespace NXTN {
 			case EventType::KeyPressed:
 			{
 				KeyPressEvent* e = (KeyPressEvent*)(event_ptr);
-				Log::Info("Key %d pressed as %d", e->GetKeyCode(), e->GetRepeatCount());
-				break;
+				switch (e->GetKeyCode())
+				{
+				case KeyCode::W:
+					m_CameraDistance -= 0.5f;
+
+					m_CameraDistance = std::max(m_CameraDistance, 0.0f);
+					break;
+				case KeyCode::S:
+					m_CameraDistance += 0.05f;
+					break;
+				case KeyCode::A:
+					m_CameraAngle -= 0.1f;
+
+					// In [-Pi, Pi]
+					m_CameraAngle = std::fmod(m_CameraAngle, NXTN_2_PI_FLOAT);
+					if (m_CameraAngle < 0.0f)
+					{
+						m_CameraAngle += NXTN_2_PI_FLOAT;
+					}
+					break;
+				case KeyCode::D:
+					m_CameraAngle += 0.1f;
+
+					// In [-Pi, Pi]
+					m_CameraAngle = std::fmod(m_CameraAngle, NXTN_2_PI_FLOAT);
+					if (m_CameraAngle < 0.0f)
+					{
+						m_CameraAngle += NXTN_2_PI_FLOAT;
+					}
+					break;
+				}
+
 			}
 			}
 
@@ -137,6 +168,30 @@ namespace NXTN {
 
 		// ====================== Time ======================
 		Time::Update();
+
+		// ====================== Camera ======================
+		m_SceneCameraTransform->position = vec3(sin(m_CameraAngle) * m_CameraDistance, 0.0f, -cos(m_CameraAngle) * m_CameraDistance);
+
+		vec3 x, y;
+		vec3 z = normalize(-m_SceneCameraTransform->position);  // Look direction
+
+		// Z facing up/down - Y aligns with world Z
+		if (z.x * z.x + z.z * z.z < EPSILON_SQ) {
+			x = vec3(1, 0.0f, 0.0f);
+			y = vec3(0.0f, 0.0f, -z.y);
+		}
+		else {
+			x = normalize(vec3(z.z, 0.0f, -z.x));  // Cross((0, 1, 0), z)
+			y = normalize(cross(z, x));
+		}
+		m_SceneCameraTransform->rotation = Quaternion::FromRotationMatrix(
+			mat4(
+				x.x, y.x, z.x, 0.0f,
+				x.y, y.y, z.y, 0.0f,
+				x.z, y.z, z.z, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f
+			)
+		);
 
 		// ====================== Rendering ======================
 		m_FrameBuffer->Bind();

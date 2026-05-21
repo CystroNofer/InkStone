@@ -14,7 +14,7 @@ namespace NXTN {
         mat4 GetPMatrix();
 
         bool isOrthographic;
-        float size;  // FOV for perspective, half height for ortho
+        float size;  // Vertical FOV for perspective, half height for ortho
         float aspectRatio;  // W:H
         float nearPlane;
         float farPlane;

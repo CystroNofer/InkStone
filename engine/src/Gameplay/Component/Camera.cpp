@@ -15,6 +15,8 @@ namespace NXTN {
 	}
 
 	mat4 Camera::GetPMatrix() {
+		float invFarMNear = 1.0f / (farPlane - nearPlane);
+
 		if (isOrthographic)  // Orthogonal
 		{
 			return mat4(
@@ -22,13 +24,19 @@ namespace NXTN {
 				0.0f, 1 / size, 0.0f, 0.0f,
 				// NDC Z in [0, 1] for engine side cliping
 				// API-specific fixes in Renderer
-				0.0f, 0.0f, 1.0f / (farPlane - nearPlane), nearPlane / (nearPlane - farPlane),
+				0.0f, 0.0f, invFarMNear, -nearPlane * invFarMNear,
 				0.0f, 0.0f, 0.0f, 1.0f
 			);
 		}
 		else  // Perspective
 		{
-			return mat4();
+			float invTanHFOV = 1 / std::tan(0.5f * size);
+			return mat4(
+				invTanHFOV / aspectRatio, 0.0f, 0.0f, 0.0f,
+				0.0f, invTanHFOV, 0.0f, 0.0f,
+				0.0f, 0.0f,	farPlane * invFarMNear, -farPlane * nearPlane * invFarMNear,
+				0.0f, 0.0f, 1.0f, 0.0f
+			);
 		}
 	}
 }
