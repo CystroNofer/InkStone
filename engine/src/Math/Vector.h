@@ -4,12 +4,11 @@
 #include <iostream>
 #include <sstream>
 
-namespace NXTN {
-	// Epsilon values are defined here since this is used by all other math modules
-	// Consider moving it elsewhere
-	inline constexpr float EPSILON = 1e-6f;
-	inline constexpr float EPSILON_SQ = 1e-12f;
+// No constant is actually used here
+// But in case normalization needs to check against Epsilon
+#include "Constant.h"
 
+namespace NXTN {
 	struct vec2
 	{
 		float x = 0;
