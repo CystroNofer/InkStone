@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef NXTN_PLATFORM_WINDOWS
+#define NOMINMAX
 #include <Windows.h>
 #endif // NXTN_PLATFORM_WINDOWS
 
