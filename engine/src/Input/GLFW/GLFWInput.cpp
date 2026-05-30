@@ -13,11 +13,11 @@ namespace NXTN {
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool GLFWInput::IsMouseButtonPressedImpl(KeyCode button)
+	bool GLFWInput::IsMouseButtonPressedImpl(MouseButtonCode button)
 	{
 		int state = glfwGetMouseButton(
 			(GLFWwindow*)(WindowManager::GetFocused()->GetNativeWindow()),
-			MapToGLFWKeyCode(button)
+			MapToGLFWMouseButton(button)
 		);
 
 		return state == GLFW_PRESS;

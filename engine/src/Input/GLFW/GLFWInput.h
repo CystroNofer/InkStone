@@ -13,7 +13,7 @@ namespace NXTN {
 
 	protected:
 		virtual bool IsKeyPressedImpl(KeyCode keycode) override;
-		virtual bool IsMouseButtonPressedImpl(KeyCode button) override;
+		virtual bool IsMouseButtonPressedImpl(MouseButtonCode button) override;
 		virtual vec2 GetMousePosImpl() override;
 
 	private:

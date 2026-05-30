@@ -12,13 +12,17 @@ namespace NXTN {
 	public:
 		static void Init();
 
-		static inline bool IsKeyPressed(KeyCode keycode) { return s_Instance->IsKeyPressedImpl(keycode); }
-		static inline bool IsMouseButtonPressed(KeyCode button) { return s_Instance->IsMouseButtonPressedImpl(button); }
+		static inline bool IsKeyPressed(KeyCode keycode) {
+			return s_Instance->IsKeyPressedImpl(keycode);
+		}
+		static inline bool IsMouseButtonPressed(MouseButtonCode button) {
+			return s_Instance->IsMouseButtonPressedImpl(button);
+		}
 		static inline vec2 GetMousePos() { return s_Instance->GetMousePosImpl(); }
 
 	protected:
 		virtual bool IsKeyPressedImpl(KeyCode keycode) = 0;
-		virtual bool IsMouseButtonPressedImpl(KeyCode button) = 0;
+		virtual bool IsMouseButtonPressedImpl(MouseButtonCode button) = 0;
 		virtual vec2 GetMousePosImpl() = 0;
 
 	private:
