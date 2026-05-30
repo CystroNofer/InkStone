@@ -50,6 +50,7 @@ namespace NXTN {
 	{
 		if (wh.id < m_Windows.size() && m_Windows[wh.id].first == wh.gen) {
 			delete m_Windows[wh.id].second;
+			m_Windows[wh.id].second = nullptr;
 			m_Windows[wh.id].first++;
 		}
 	}
