@@ -5,8 +5,7 @@
 #include "Input/Keycode.h"
 
 namespace NXTN {
-	OpenGLUI::OpenGLUI(const std::shared_ptr<Window>& window)
-		: m_Window(window)
+	OpenGLUI::OpenGLUI(unsigned int w, unsigned int h)
 	{
 		ImGui::CreateContext();
 
@@ -16,7 +15,7 @@ namespace NXTN {
 
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
 
-		io.DisplaySize = ImVec2(m_Window->GetWidth(), m_Window->GetHeight());
+		io.DisplaySize = ImVec2(w, h);
 
 		if (io.BackendRendererUserData == nullptr)
 		{
@@ -73,7 +72,8 @@ namespace NXTN {
 		{
 		case EventType::WindowResized:
 		{
-			io.DisplaySize = ImVec2(m_Window->GetWidth(), m_Window->GetHeight());
+			WindowResizeEvent e = *((WindowResizeEvent*)event_ptr);
+			io.DisplaySize = ImVec2(e.GetNewWidth(), e.GetNewHeight());
 			break;
 		}
 		case EventType::KeyPressed:

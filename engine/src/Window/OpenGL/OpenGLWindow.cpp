@@ -143,6 +143,8 @@ namespace NXTN {
 		glfwPollEvents();
 
 		glfwSwapBuffers(m_Window);
+
+		Log::Info("Window Update");
 	}
 
 	void OpenGLWindow::SetVSync(bool enabled)

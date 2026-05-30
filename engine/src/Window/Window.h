@@ -6,13 +6,20 @@
 #include "Log.h"
 #include "Event/EventBuffer.h"
 
+#include <cmath>
+
 namespace NXTN {
+	// Forward declaration
+	class WindowManager;
+
 	class Window
 	{
+		friend WindowManager;
 	public:
-		//using EventCallbackFn = std::function<void(Event&)>;
-
-		virtual ~Window() {}
+		Window(const Window&) = delete;
+		Window(Window&&) = delete;
+		Window& operator=(const Window&) = delete;
+		Window& operator=(Window&&) = delete;
 
 		virtual void Update() = 0;
 
@@ -21,10 +28,32 @@ namespace NXTN {
 		virtual bool IsVSync() const = 0;
 		virtual void SetVSync(bool enabled) = 0;
 
-		//virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
-
 		virtual void* GetNativeWindow() const = 0;
 
-		static Window* Create(std::string title = "InkStone");
+	protected:
+		Window() = default;
+		virtual ~Window() {}
+	};
+
+	struct WindowHandle {
+		size_t id;
+		uint32_t gen;
+	};
+
+	class WindowManager
+	{
+	public:
+		static WindowHandle Create(std::string title = "InkStone");
+		// Returning Window* is safe since
+		// The deconstructor is protected (friend to WindowManager)
+		// And the copy constructor is deleted
+		static Window* Get(WindowHandle& wh);
+		static void Destroy(WindowHandle& wh);
+
+	private:
+		WindowManager() {}
+		~WindowManager() {}
+
+		static std::vector<std::pair<uint32_t, Window*>> m_Windows;
 	};
 }

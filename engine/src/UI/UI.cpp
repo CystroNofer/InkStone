@@ -5,7 +5,7 @@
 namespace NXTN {
 	std::unique_ptr<UI> UI::s_UI = nullptr;
 
-	void UI::Init(const std::shared_ptr<Window>& window)
+	void UI::Init(unsigned int w, unsigned int h)
 	{
 		switch (APISetting::GetGraphicsAPI())
 		{
@@ -13,7 +13,7 @@ namespace NXTN {
 			Log::Error("No rendering API specified");
 			break;
 		case GraphicsAPI::OpenGL:
-			s_UI.reset(new OpenGLUI(window));
+			s_UI.reset(new OpenGLUI(w, h));
 			break;
 		default:
 			Log::Error("Unsupported rendering API");

@@ -53,7 +53,7 @@ namespace NXTN {
 		void Run();
 
 	private:
-		std::shared_ptr<Window> m_Window;
+		WindowHandle m_WindowHandle;
 
 		bool m_Alive;
 		bool m_Minimized;

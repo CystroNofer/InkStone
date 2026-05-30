@@ -28,7 +28,7 @@ namespace NXTN {
 		// Reuse ID
 		EntityID i = m_RecycledEntityIDs.back();
 		m_RecycledEntityIDs.pop_back();
-		// Generation incremented when destroyed
+		// Generation already incremented when destroyed
 
 		Log::Info("New entity: ID %d, Gen %d", i, m_Generations[i]);
 

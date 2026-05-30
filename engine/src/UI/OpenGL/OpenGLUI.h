@@ -9,15 +9,12 @@ namespace NXTN {
 	class OpenGLUI : public UI
 	{
 	public:
-		OpenGLUI(const std::shared_ptr<Window>& window);
+		OpenGLUI(unsigned int w, unsigned int h);
 		~OpenGLUI() {}
 
 		virtual void NewFrameImpl() override;
 		virtual void EndFrameImpl() override;
 
 		virtual void OnEventImpl(Event*& event_ptr) override;
-
-	private:
-		const std::shared_ptr<Window>& m_Window;
 	};
 }

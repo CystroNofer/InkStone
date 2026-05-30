@@ -9,7 +9,7 @@ namespace NXTN {
 	public:
 		virtual ~UI() {}
 
-		static void Init(const std::shared_ptr<Window>& window);
+		static void Init(unsigned int w, unsigned int h);
 		
 		// Public static interface/wrapper
 		static void NewFrame();

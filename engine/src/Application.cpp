@@ -12,13 +12,16 @@ namespace NXTN {
 
 		Time::InitTime();
 
-		m_Window.reset(Window::Create());
+		m_WindowHandle = WindowManager::Create();
 
 		Renderer::Init();
 
 		//Input::Init(m_Window->GetNativeWindow());
 
-		UI::Init(m_Window);
+		Window* tmpWinPtr = WindowManager::Get(m_WindowHandle);
+		unsigned int winWidth = tmpWinPtr->GetWidth();
+		unsigned int winHeight = tmpWinPtr->GetHeight();
+		UI::Init(winWidth, winHeight);
 		// UI config
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -43,11 +46,11 @@ namespace NXTN {
 
 		// Camera
 		//m_SceneCamera.reset(new Camera(true, 1.0f, m_Window->GetWidth() / (float)m_Window->GetHeight(), 0.01f, 100.0f));
-		m_SceneCamera.reset(new Camera(false, 60.0f, m_Window->GetWidth() / (float)m_Window->GetHeight(), 0.01f, 100.0f));
+		m_SceneCamera.reset(new Camera(false, 60.0f, winWidth / (float)winHeight, 0.01f, 100.0f));
 		m_SceneCameraTransform.reset(new Transform());
 		m_SceneCameraTransform->position = vec3(0.0f, 0.0f, -m_CameraDistance);
 
-		m_FrameBuffer.reset(FrameBuffer::Create(m_Window->GetWidth(), m_Window->GetHeight()));
+		m_FrameBuffer.reset(FrameBuffer::Create(winWidth, winHeight));
 
 		// Temporary draw data
 		// Vertex buffer
@@ -105,7 +108,7 @@ namespace NXTN {
 
 		// ====================== Event ======================
 		EventBuffer::PushEvent(new ApplicationUpdateEvent());
-		
+
 		for (Event*& event_ptr : EventBuffer::GetEventBuffer())
 		{
 			switch (event_ptr->GetEventType())
@@ -271,7 +274,7 @@ namespace NXTN {
 		}
 		UI::EndFrame();
 
-		m_Window->Update();
+		WindowManager::Get(m_WindowHandle)->Update();
 	}
 
 	void Application::Run()
