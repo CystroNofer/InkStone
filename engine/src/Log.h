@@ -11,6 +11,7 @@ namespace NXTN {
 		template <typename... Args>
 		static void Info(const char* msg, Args... args)
 		{
+			Log::tt = std::time(nullptr);
 			localtime_s(&ltm, &tt);
 
 			mtx.lock();
@@ -23,6 +24,7 @@ namespace NXTN {
 		template <typename... Args>
 		static void Warning(const char* msg, Args... args)
 		{
+			Log::tt = std::time(nullptr);
 			localtime_s(&ltm, &tt);
 
 			//mtx.try_lock();  // Non-blocking
@@ -36,6 +38,7 @@ namespace NXTN {
 		template <typename... Args>
 		static void Error(const char* msg, Args... args)
 		{
+			Log::tt = std::time(nullptr);
 			localtime_s(&ltm, &tt);
 
 			mtx.lock();

@@ -4,11 +4,12 @@
 
 namespace NXTN {
 	std::mutex Log::mtx;
-	time_t Log::tt = time(0);
+	time_t Log::tt = std::time(nullptr);
 	tm Log::ltm;
 
 	void Log::Info(const std::string& msg)
 	{
+		Log::tt = std::time(nullptr);
 		localtime_s(&ltm, &tt);
 
 		mtx.lock();
