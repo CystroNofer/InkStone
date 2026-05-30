@@ -7,8 +7,9 @@
 namespace NXTN {
 	static bool s_GLFWInitialized = false;
 
-	OpenGLWindow::OpenGLWindow(std::string title, bool vSyncOption)
+	OpenGLWindow::OpenGLWindow(size_t _id, std::string title, bool vSyncOption)
 	{
+		m_WinData.id = _id;
 		m_WinData.vSync = vSyncOption;
 		//EventCallback = [](Event&) {};
 
@@ -61,6 +62,15 @@ namespace NXTN {
 		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
 			{
 				EventBuffer::PushEvent(new WindowCloseEvent());
+			}
+		);
+		// Window focus
+		glfwSetWindowFocusCallback(m_Window, [](GLFWwindow* window, int focused)
+			{
+				if (focused == GLFW_FOCUSED) WindowManager::OnFocused(
+					((WindowData*)glfwGetWindowUserPointer(window))->id
+				);
+				Log::Info("Window focused");
 			}
 		);
 		// Window resize
@@ -143,8 +153,6 @@ namespace NXTN {
 		glfwPollEvents();
 
 		glfwSwapBuffers(m_Window);
-
-		Log::Info("Window Update");
 	}
 
 	void OpenGLWindow::SetVSync(bool enabled)

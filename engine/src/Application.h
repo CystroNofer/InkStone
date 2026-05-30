@@ -25,6 +25,8 @@
 #include "Gameplay/Component/Transform.h"
 #include "Gameplay/System/SceneRenderer.h"
 
+#include "Input/Input.h"
+
 #include "Math/Math.h"
 
 #include "Rendering/FrameBuffer.h"

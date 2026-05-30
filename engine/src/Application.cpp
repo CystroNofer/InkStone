@@ -16,7 +16,7 @@ namespace NXTN {
 
 		Renderer::Init();
 
-		//Input::Init(m_Window->GetNativeWindow());
+		Input::Init();
 
 		Window* tmpWinPtr = WindowManager::Get(m_WindowHandle);
 		unsigned int winWidth = tmpWinPtr->GetWidth();
@@ -126,42 +126,38 @@ namespace NXTN {
 				Renderer::ResizeViewport((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
 				break;
 			}
-			case EventType::KeyPressed:
-			{
-				KeyPressEvent* e = (KeyPressEvent*)(event_ptr);
-				switch (e->GetKeyCode())
-				{
-				case KeyCode::W:
-					m_CameraDistance -= 0.5f;
+			//case EventType::KeyPressed:
+			//{
 
-					m_CameraDistance = std::max(m_CameraDistance, 0.0f);
-					break;
-				case KeyCode::S:
-					m_CameraDistance += 0.05f;
-					break;
-				case KeyCode::A:
-					m_CameraAngle -= 0.1f;
-
-					// In [-Pi, Pi]
-					m_CameraAngle = std::fmod(m_CameraAngle, NXTN_2_PI_FLOAT);
-					if (m_CameraAngle < 0.0f)
-					{
-						m_CameraAngle += NXTN_2_PI_FLOAT;
-					}
-					break;
-				case KeyCode::D:
-					m_CameraAngle += 0.1f;
-
-					// In [-Pi, Pi]
-					m_CameraAngle = std::fmod(m_CameraAngle, NXTN_2_PI_FLOAT);
-					if (m_CameraAngle < 0.0f)
-					{
-						m_CameraAngle += NXTN_2_PI_FLOAT;
-					}
-					break;
-				}
-
+			//}
 			}
+
+			if (Input::IsKeyPressed(KeyCode::W)) {
+				m_CameraDistance -= 2.0f * Time::GetDeltaTime();
+				m_CameraDistance = std::max(m_CameraDistance, 0.0f);
+			}
+			if (Input::IsKeyPressed(KeyCode::S)) {
+				m_CameraDistance += 2.0f * Time::GetDeltaTime();
+			}
+			if (Input::IsKeyPressed(KeyCode::A)) {
+				m_CameraAngle -= 2.0f * Time::GetDeltaTime();
+
+				// In [-Pi, Pi]
+				m_CameraAngle = std::fmod(m_CameraAngle, NXTN_2_PI_FLOAT);
+				if (m_CameraAngle < 0.0f)
+				{
+					m_CameraAngle += NXTN_2_PI_FLOAT;
+				}
+			}
+			if (Input::IsKeyPressed(KeyCode::D)) {
+				m_CameraAngle += 2.0f * Time::GetDeltaTime();
+
+				// In [-Pi, Pi]
+				m_CameraAngle = std::fmod(m_CameraAngle, NXTN_2_PI_FLOAT);
+				if (m_CameraAngle < 0.0f)
+				{
+					m_CameraAngle += NXTN_2_PI_FLOAT;
+				}
 			}
 
 			UI::OnEvent(event_ptr);

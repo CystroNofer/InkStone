@@ -3,11 +3,24 @@
 #include "OpenGL/OpenGLWindow.h"
 
 namespace NXTN {
-	std::vector<std::pair<uint32_t, Window*>> WindowManager::m_Windows;
+	std::vector<std::pair<uint32_t, Window*>> WindowManager::s_Windows;
+	size_t WindowManager::s_LastFocusedID = 0;
 
 	WindowHandle WindowManager::Create(std::string title)
 	{
-		Window* winPtr = nullptr;
+		// i will be the slot id for the window
+		size_t i = 0;
+		bool needNew = true;
+		for (; i < s_Windows.size(); i++) {
+			if (s_Windows[i].second = nullptr) {
+				// Generation is incremented when the last was destroyed
+				needNew = false;
+				break;
+			}
+		}
+		if (needNew) {
+			s_Windows.push_back({ 0, nullptr });
+		}
 
 		switch (APISetting::GetGraphicsAPI())
 		{
@@ -15,32 +28,19 @@ namespace NXTN {
 			Log::Error("No rendering API specified");
 			break;
 		case GraphicsAPI::OpenGL:
-			winPtr = new OpenGLWindow(title);
+			s_Windows[i].second = new OpenGLWindow(i, title);
 			break;
 		default:
 			Log::Error("Unsupported rendering API");
 			break;
 		}
 
-		if (winPtr) {
-			for (size_t i = 0; i < m_Windows.size(); i++) {
-				if (m_Windows[i].second = nullptr) {
-					m_Windows[i].second = winPtr;
-					// Generation is incremented when the last was destroyed
-					return { i, m_Windows[i].first };
-				}
-			}
-
-			m_Windows.push_back({ 1, winPtr });
-			return { m_Windows.size() - 1, 1 };
-		}
-
-		return { SIZE_MAX, 0 };
+		return { i, s_Windows[i].first };
 	}
 
 	Window* WindowManager::Get(WindowHandle& wh) {
-		if (wh.id < m_Windows.size() && m_Windows[wh.id].first == wh.gen) {
-			return m_Windows[wh.id].second;
+		if (wh.id < s_Windows.size() && s_Windows[wh.id].first == wh.gen) {
+			return s_Windows[wh.id].second;
 		}
 
 		return nullptr;
@@ -48,10 +48,24 @@ namespace NXTN {
 
 	void WindowManager::Destroy(WindowHandle& wh)
 	{
-		if (wh.id < m_Windows.size() && m_Windows[wh.id].first == wh.gen) {
-			delete m_Windows[wh.id].second;
-			m_Windows[wh.id].second = nullptr;
-			m_Windows[wh.id].first++;
+		if (wh.id < s_Windows.size() && s_Windows[wh.id].first == wh.gen) {
+			delete s_Windows[wh.id].second;
+			s_Windows[wh.id].second = nullptr;
+			s_Windows[wh.id].first++;
 		}
+	}
+
+	void WindowManager::OnFocused(size_t id)
+	{
+		s_LastFocusedID = id;
+	}
+
+	Window* WindowManager::GetFocused()
+	{
+		if (s_LastFocusedID < s_Windows.size())
+		{
+			return s_Windows[s_LastFocusedID].second;
+		}
+		return nullptr;
 	}
 }

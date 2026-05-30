@@ -49,11 +49,14 @@ namespace NXTN {
 		// And the copy constructor is deleted
 		static Window* Get(WindowHandle& wh);
 		static void Destroy(WindowHandle& wh);
+		static void OnFocused(size_t id);
+		static Window* GetFocused();
 
 	private:
 		WindowManager() {}
 		~WindowManager() {}
 
-		static std::vector<std::pair<uint32_t, Window*>> m_Windows;
+		static std::vector<std::pair<uint32_t, Window*>> s_Windows;
+		static size_t s_LastFocusedID;
 	};
 }
