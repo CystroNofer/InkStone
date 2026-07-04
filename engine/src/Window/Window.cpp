@@ -4,38 +4,39 @@
 
 namespace NXTN {
 	std::vector<std::pair<uint32_t, Window*>> WindowManager::s_Windows;
-	size_t WindowManager::s_LastFocusedID = 0;
+	WindowHandle WindowManager::s_LastFocusedHandle = { SIZE_MAX, 0 };
 
 	WindowHandle WindowManager::Create(std::string title)
 	{
-		// i will be the slot id for the window
-		size_t i = 0;
-		bool needNew = true;
-		for (; i < s_Windows.size(); i++) {
-			if (s_Windows[i].second = nullptr) {
-				// Generation is incremented when the last was destroyed
-				needNew = false;
-				break;
-			}
-		}
-		if (needNew) {
-			s_Windows.push_back({ 0, nullptr });
-		}
-
+		Window* p = nullptr;
 		switch (APISetting::GetGraphicsAPI())
 		{
 		case GraphicsAPI::None:
 			Log::Error("No rendering API specified");
 			break;
 		case GraphicsAPI::OpenGL:
-			s_Windows[i].second = new OpenGLWindow(i, title);
+			p = new OpenGLWindow(title);
 			break;
 		default:
 			Log::Error("Unsupported rendering API");
 			break;
 		}
+		
+		if (p) {
+			for (size_t i = 0; i < s_Windows.size(); i++) {
+				if (s_Windows[i].second == nullptr) {
+					s_Windows[i].second = p;
+					// Generation is incremented when the last was destroyed
+					s_LastFocusedHandle = { i, s_Windows[i].first };
+					return s_LastFocusedHandle;
+				}
+			}
+			s_LastFocusedHandle = { s_Windows.size(), 1};
+			s_Windows.push_back({1, p});
+			return s_LastFocusedHandle;
+		}
 
-		return { i, s_Windows[i].first };
+		return { SIZE_MAX, 0 };
 	}
 
 	Window* WindowManager::Get(WindowHandle& wh) {
@@ -55,17 +56,23 @@ namespace NXTN {
 		}
 	}
 
-	void WindowManager::OnFocused(size_t id)
+	void WindowManager::OnFocused(Window* winPtr, bool focused)
 	{
-		s_LastFocusedID = id;
+		if (focused) {
+			for (size_t i = 0; i < s_Windows.size(); i++) {
+				if (s_Windows[i].second = winPtr) {
+					s_LastFocusedHandle = { i, s_Windows[i].first };
+					break;
+				}
+			}
+		}
+		else if (GetFocused() == winPtr) {
+			s_LastFocusedHandle = { SIZE_MAX, 0 };
+		}
 	}
 
 	Window* WindowManager::GetFocused()
 	{
-		if (s_LastFocusedID < s_Windows.size())
-		{
-			return s_Windows[s_LastFocusedID].second;
-		}
-		return nullptr;
+		return Get(s_LastFocusedHandle);
 	}
 }

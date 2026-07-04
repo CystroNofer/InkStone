@@ -7,9 +7,9 @@
 namespace NXTN {
 	static bool s_GLFWInitialized = false;
 
-	OpenGLWindow::OpenGLWindow(size_t _id, std::string title, bool vSyncOption)
+	OpenGLWindow::OpenGLWindow(std::string title, bool vSyncOption)
 	{
-		m_WinData.id = _id;
+		m_WinData._this = this;
 		m_WinData.vSync = vSyncOption;
 		//EventCallback = [](Event&) {};
 
@@ -67,10 +67,9 @@ namespace NXTN {
 		// Window focus
 		glfwSetWindowFocusCallback(m_Window, [](GLFWwindow* window, int focused)
 			{
-				if (focused == GLFW_FOCUSED) WindowManager::OnFocused(
-					((WindowData*)glfwGetWindowUserPointer(window))->id
-				);
-				Log::Info("Window focused");
+				WindowData& windowData = *(WindowData*)glfwGetWindowUserPointer(window);
+
+				WindowManager::OnFocused(windowData._this, focused == GL_TRUE);
 			}
 		);
 		// Window resize
@@ -120,6 +119,7 @@ namespace NXTN {
 				case GLFW_RELEASE:
 					EventBuffer::PushEvent(new MouseButtonReleaseEvent(k));
 					break;
+				// Mouse button does NOT fire hold events
 				}
 			}
 		);
@@ -149,8 +149,6 @@ namespace NXTN {
 	void OpenGLWindow::Update()
 	{
 		NXTN_PROFILE_FUNCTION()
-
-		glfwPollEvents();
 
 		glfwSwapBuffers(m_Window);
 	}

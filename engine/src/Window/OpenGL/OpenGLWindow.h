@@ -9,7 +9,7 @@ namespace NXTN {
 	class OpenGLWindow : public Window
 	{
 	public:
-		OpenGLWindow(size_t _id, std::string title, bool vSyncOption = false);
+		OpenGLWindow(std::string title, bool vSyncOption = false);
 		virtual ~OpenGLWindow();
 
 		virtual void Update() override;
@@ -28,12 +28,10 @@ namespace NXTN {
 
 		struct WindowData
 		{
-			size_t id;
+			Window* _this;
 			int width = 0, height = 0;
 			std::string title;
 			bool vSync = false;
-
-			//EventCallbackFn EventCallback;
 		};
 
 		WindowData m_WinData;
