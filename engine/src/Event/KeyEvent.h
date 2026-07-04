@@ -20,14 +20,14 @@ namespace NXTN {
 	class KeyPressEvent : public KeyEvent
 	{
 	public:
-		KeyPressEvent(KeyCode keyCode, int repeatCount) : KeyEvent(keyCode), m_RepeatCount(repeatCount) {};
+		KeyPressEvent(KeyCode keyCode, unsigned int repeatCount) : KeyEvent(keyCode), m_RepeatCount(repeatCount) {};
 
 		virtual EventType GetEventType() const override { return EventType::KeyPressed; }
 
-		inline int GetRepeatCount() const { return m_RepeatCount; }
+		inline unsigned int GetRepeatCount() const { return m_RepeatCount; }
 
 	private:
-		int m_RepeatCount;
+		unsigned int m_RepeatCount;
 	};
 
 	class KeyReleaseEvent : public KeyEvent

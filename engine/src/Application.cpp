@@ -106,6 +106,8 @@ namespace NXTN {
 	{
 		//NXTN_PROFILE_FUNCTION()
 
+		Input::Update();
+
 		// ====================== Event ======================
 		EventBuffer::PushEvent(new ApplicationUpdateEvent());
 
@@ -126,32 +128,19 @@ namespace NXTN {
 				Renderer::ResizeViewport((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
 				break;
 			}
-			//case EventType::KeyPressed:
-			//{
+			case EventType::MouseScroll:
+			{
+				MouseScrollEvent* e = (MouseScrollEvent*)(event_ptr);
+				m_CameraDistance = std::max(m_CameraDistance - e->GetY(), 0.1f);
 
-			//}
+				break;
+			}
 			}
 
-			if (Input::IsKeyPressed(KeyCode::W)) {
-				m_CameraDistance -= 2.0f * Time::GetDeltaTime();
-				m_CameraDistance = std::max(m_CameraDistance, 0.0f);
-			}
-			if (Input::IsKeyPressed(KeyCode::S)) {
-				m_CameraDistance += 2.0f * Time::GetDeltaTime();
-			}
-			if (Input::IsKeyPressed(KeyCode::A)) {
-				m_CameraAngle -= 2.0f * Time::GetDeltaTime();
+			if (Input::IsMouseButtonPressed(MouseButtonCode::Button2)) {
+				vec2 mouseMovement = Input::GetMouseMovement();
 
-				// In [-Pi, Pi]
-				m_CameraAngle = std::fmod(m_CameraAngle, NXTN_2_PI_FLOAT);
-				if (m_CameraAngle < 0.0f)
-				{
-					m_CameraAngle += NXTN_2_PI_FLOAT;
-				}
-			}
-			if (Input::IsKeyPressed(KeyCode::D)) {
-				m_CameraAngle += 2.0f * Time::GetDeltaTime();
-
+				m_CameraAngle -= mouseMovement.x * 1.5f * Time::GetDeltaTime();
 				// In [-Pi, Pi]
 				m_CameraAngle = std::fmod(m_CameraAngle, NXTN_2_PI_FLOAT);
 				if (m_CameraAngle < 0.0f)
