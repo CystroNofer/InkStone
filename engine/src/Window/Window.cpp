@@ -32,7 +32,7 @@ namespace NXTN {
 			return s_LastFocusedHandle;
 		}
 
-		return { SIZE_MAX, 0 };
+		return Handle<Window>::invalid;
 	}
 
 	Window* WindowManager::Get(Handle<Window>& wh) {
