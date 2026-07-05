@@ -3,19 +3,19 @@
 #include "OpenGL/OpenGLWindow.h"
 
 namespace NXTN {
-	std::vector<std::pair<uint32_t, Window*>> WindowManager::s_Windows;
-	WindowHandle WindowManager::s_LastFocusedHandle = { SIZE_MAX, 0 };
+	HandleMap<Window> WindowManager::s_Windows;
+	Handle<Window> WindowManager::s_LastFocusedHandle = { SIZE_MAX, 0 };
 
-	WindowHandle WindowManager::Create(std::string title)
+	Handle<Window> WindowManager::Create(std::string title)
 	{
-		Window* p = nullptr;
+		Window* p;
 		switch (APISetting::GetGraphicsAPI())
 		{
 		case GraphicsAPI::None:
 			Log::Error("No rendering API specified");
 			break;
 		case GraphicsAPI::OpenGL:
-			p = new OpenGLWindow(title);
+			p = (Window*)(new OpenGLWindow(title));
 			break;
 		default:
 			Log::Error("Unsupported rendering API");
@@ -23,50 +23,33 @@ namespace NXTN {
 		}
 		
 		if (p) {
-			for (size_t i = 0; i < s_Windows.size(); i++) {
-				if (s_Windows[i].second == nullptr) {
-					s_Windows[i].second = p;
-					// Generation is incremented when the last was destroyed
-					s_LastFocusedHandle = { i, s_Windows[i].first };
-					return s_LastFocusedHandle;
-				}
-			}
-			s_LastFocusedHandle = { s_Windows.size(), 1};
-			s_Windows.push_back({1, p});
+			s_LastFocusedHandle = s_Windows.Add(p);
+
+			p->SetFocusedCallback([](bool focused) {
+				OnFocused(s_LastFocusedHandle, focused);
+			});
+
 			return s_LastFocusedHandle;
 		}
 
 		return { SIZE_MAX, 0 };
 	}
 
-	Window* WindowManager::Get(WindowHandle& wh) {
-		if (wh.id < s_Windows.size() && s_Windows[wh.id].first == wh.gen) {
-			return s_Windows[wh.id].second;
-		}
-
-		return nullptr;
+	Window* WindowManager::Get(Handle<Window>& wh) {
+		return s_Windows.Get(wh);
 	}
 
-	void WindowManager::Destroy(WindowHandle& wh)
+	void WindowManager::Destroy(Handle<Window>& wh)
 	{
-		if (wh.id < s_Windows.size() && s_Windows[wh.id].first == wh.gen) {
-			delete s_Windows[wh.id].second;
-			s_Windows[wh.id].second = nullptr;
-			s_Windows[wh.id].first++;
-		}
+		s_Windows.Remove(wh);
 	}
 
-	void WindowManager::OnFocused(Window* winPtr, bool focused)
+	void WindowManager::OnFocused(Handle<Window> wh, bool focused)
 	{
-		if (focused) {
-			for (size_t i = 0; i < s_Windows.size(); i++) {
-				if (s_Windows[i].second = winPtr) {
-					s_LastFocusedHandle = { i, s_Windows[i].first };
-					break;
-				}
-			}
+		if (focused && s_Windows.Validate(wh)) {
+			s_LastFocusedHandle = wh;
 		}
-		else if (GetFocused() == winPtr) {
+		else if (s_LastFocusedHandle == wh) {
 			s_LastFocusedHandle = { SIZE_MAX, 0 };
 		}
 	}

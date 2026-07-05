@@ -55,7 +55,7 @@ namespace NXTN {
 		void Run();
 
 	private:
-		WindowHandle m_WindowHandle;
+		Handle<Window> m_WindowHandle;
 
 		bool m_Alive;
 		bool m_Minimized;
