@@ -19,13 +19,15 @@ namespace NXTN {
 		void Rotate(float angle, const vec3& axis);
 		vec3 ApplyRotation(const vec3& vector);
 
-		mat4 GetRotationMatrix();
+		mat4 ToRotationMatrix();
 		static Quaternion FromRotationMatrix(mat4 r);
 
 		std::string ToString();
 	};
 
-	void normalize(Quaternion& q);
+	Quaternion normalize(const Quaternion& q);
+
+	Quaternion RotationFromTo(const vec3& from, const vec3& to);
 
 	Quaternion operator*(const Quaternion& qa, const Quaternion& qb);
 	void operator*=(Quaternion& qa, const Quaternion& qb);

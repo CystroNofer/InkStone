@@ -58,7 +58,7 @@ namespace NXTN {
 		return res;
 	}
 
-	mat4 Quaternion::GetRotationMatrix()
+	mat4 Quaternion::ToRotationMatrix()
 	{
 		float r11 = 1.0f - 2.0f * (y * y + z * z);
 		float r12 = 2.0f * (x * y - w * z);
@@ -113,23 +113,56 @@ namespace NXTN {
 		}
 	}
 
-	void normalize(Quaternion& q) {
+	Quaternion normalize(const Quaternion& q) {
 		float l = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
 
 		if (l < EPSILON_SQ) {
-			q.w = 1.0f;
-			q.x = 0.0f;
-			q.y = 0.0f;
-			q.z = 0.0f;
-			return;
+			return Quaternion();
 		}
-		
+
 		float invSqrtL = 1.0f / std::sqrt(l);
 
-		q.w *= invSqrtL;
-		q.x *= invSqrtL;
-		q.y *= invSqrtL;
-		q.z *= invSqrtL;
+		return Quaternion(
+			q.w * invSqrtL,
+			q.x * invSqrtL,
+			q.y * invSqrtL,
+			q.z * invSqrtL
+		);
+	}
+
+	Quaternion RotationFromTo(const vec3& from, const vec3& to)
+	{
+		float d = dot(from, to);
+
+		// Same direction
+		if (d > 1.0f - EPSILON_SQ)
+		{
+			return { 0.0f, 0.0f, 0.0f, 1.0f };
+		}
+		// Opposite direction: no unique shortest axis
+		if (d < EPSILON_SQ - 1.0f)
+		{
+			vec3 axis = cross(vec3{ 1.0f, 0.0f, 0.0f }, from);
+			if (length(axis) < EPSILON)
+			{
+				axis = cross(vec3{ 0.0f, 1.0f, 0.0f }, from);
+			}
+			axis = normalize(axis);
+
+			// 180-degree rotation
+			return { axis.x, axis.y, axis.z, 0.0f };
+		}
+
+		vec3 axis = cross(from, to);
+
+		;
+
+		return normalize(Quaternion(
+			axis.x,
+			axis.y,
+			axis.z,
+			1.0f + d
+		));
 	}
 
 	Quaternion operator*(const Quaternion& qa, const Quaternion& qb)
