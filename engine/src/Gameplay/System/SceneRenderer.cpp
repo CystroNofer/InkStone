@@ -6,19 +6,32 @@ namespace NXTN {
 
 	}
 
-	void SceneRenderer::Run(std::unique_ptr<Registry>& registry, std::shared_ptr<Transform> ct, std::shared_ptr<Camera> c) {
+	void SceneRenderer::Run(
+		std::unique_ptr<Registry>& registry,
+		std::shared_ptr<Transform> ct,
+		std::shared_ptr<Camera> c
+	) {
 		Renderer::SetVPMatrix(mul(c->GetPMatrix(), GetVMatrix(ct)));
 
 		std::vector<RenderItem> renderItems;
 
 		registry->Each<Transform, Renderable>([&](EntityID _, Transform& t, Renderable& r)
 			{
-				if (r.meshRef && r.shaderRef) renderItems.emplace_back(r.meshRef, r.shaderRef, t.GetMMatrix());
+				if (
+					r.meshRef &&
+					ShaderManager::Validate(r.shaderHandle)
+				) {
+					renderItems.emplace_back(r.meshRef, r.shaderHandle, t.GetMMatrix());
+				}
 			}
 		);
 
 		for (RenderItem& i : renderItems) {
-			Renderer::DrawMesh(i.meshRef, i.shaderRef, i.mMatrix);
+			Renderer::DrawMesh(
+				i.meshRef,
+				ShaderManager::Get(i.shaderHandle),
+				i.mMatrix
+			);
 		}
 	}
 

@@ -18,7 +18,7 @@ namespace NXTN {
 	private:
 		struct RenderItem {
 			std::shared_ptr<Mesh> meshRef;
-			std::shared_ptr<Shader> shaderRef;
+			Handle<Shader> shaderHandle;
 			mat4 mMatrix;
 		};
 

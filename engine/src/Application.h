@@ -10,6 +10,8 @@
 #include "LayerStack.h"
 #include "Log.h"
 
+#include "Asset/ShaderManager.h"
+
 #include "Event/Event.h"
 #include "Event/ApplicationEvent.h"
 #include "Event/KeyEvent.h"
@@ -66,7 +68,7 @@ namespace NXTN {
 		std::shared_ptr<FrameBuffer> m_FrameBuffer;
 		//std::shared_ptr<Scene> m_TestScene;
 		std::shared_ptr<Texture2D> m_Texture;
-		Shader* m_Shader;
+		Handle<Shader> m_ShaderHandle;
 
 		float m_CameraAngle = 0;
 		float m_CameraDistance = 10;

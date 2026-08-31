@@ -76,7 +76,7 @@ namespace NXTN {
 		};
 
 		// Shader
-		m_Shader = Shader::Create("Asset/Shader/Texture.glsl");
+		m_ShaderHandle = ShaderManager::Load("Asset/Shader/Texture.glsl");
 		// Texture
 		m_Texture.reset(Texture2D::Create("Asset/Texture/uv_map_rg_bottom_left_1024.png"));
 
@@ -84,14 +84,13 @@ namespace NXTN {
 		m_Registry.reset(new Registry());
 		EntityID id = m_Registry->NewEntity();
 		m_Registry->AddComponent<Transform>(id);
-		m_Registry->AddComponent<Renderable, Mesh*, Shader*>(
+		m_Registry->AddComponent<Renderable, Mesh*, Handle<Shader>>(
 			id,
 			new Mesh(
 				VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
 				IndexBuffer::Create(indices, 6)
 			),
-			// Bad practice. Use more manageable ref
-			std::move(m_Shader)
+			m_ShaderHandle
 		);
 
 		m_SceneRenderer.reset(new SceneRenderer());
@@ -189,7 +188,7 @@ namespace NXTN {
 		Renderer::ClearFrameBuffer();
 
 		m_Texture->Bind(0);
-		m_Shader->SetUniformInt("u_MainTex", 0);
+		ShaderManager::Get(m_ShaderHandle)->SetUniformInt("u_MainTex", 0);
 
 		m_SceneRenderer->Run(m_Registry, m_SceneCameraTransform, m_SceneCamera);
 

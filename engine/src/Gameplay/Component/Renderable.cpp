@@ -5,5 +5,5 @@
 namespace NXTN {
 	Renderable::Renderable() : meshRef(nullptr) {}
 
-	Renderable::Renderable(Mesh* m, Shader* s) : meshRef(m), shaderRef(s) {}
+	Renderable::Renderable(Mesh* m, Handle<Shader> s) : meshRef(m), shaderHandle(s) {}
 }

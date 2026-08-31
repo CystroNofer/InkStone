@@ -2,7 +2,7 @@
 
 #include "ECS/Component.h"
 #include "Rendering/Mesh.h"
-#include "Rendering/Shader.h"
+#include "Asset/ShaderManager.h"
 #include "Math/Math.h"
 
 namespace NXTN {
@@ -11,14 +11,14 @@ namespace NXTN {
 	public:
 		Renderable();
 		// TODO: Update to handles
-		Renderable(Mesh* m, Shader* s);
+		Renderable(Mesh* m, Handle<Shader> s);
 
 		// TODO: Add materials
 
 
 		// TODO: Update to handles
 		std::shared_ptr<Mesh> meshRef;
-		std::shared_ptr<Shader> shaderRef;
+		Handle<Shader> shaderHandle;
 	};
 }
 
