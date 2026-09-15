@@ -4,13 +4,14 @@
 
 namespace NXTN {
 	Camera::Camera(bool isOrthographic_, float size_, float aspectRatio_, float nearPlane_, float farPlane_)
-		: isOrthographic(isOrthographic_), size(size_), aspectRatio(aspectRatio_), nearPlane(nearPlane_), farPlane(farPlane_)
+		: isOrthographic(isOrthographic_),
+		size(isOrthographic_ ? size_ : size_ * NXTN_DEG_2_RAD_FLOAT),
+		aspectRatio(aspectRatio_), nearPlane(nearPlane_), farPlane(farPlane_)
 	{
 
 	}
 
-	void Camera::ResizeViewport(float size_, float aspectRatio_) {
-		size = size_;
+	void Camera::ResizeViewport(float aspectRatio_) {
 		aspectRatio = aspectRatio_;
 	}
 

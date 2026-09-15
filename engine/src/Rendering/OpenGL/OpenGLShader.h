@@ -9,7 +9,7 @@ namespace NXTN {
 	class OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader(const std::string& filepath);
+		OpenGLShader(const ShaderProgramDescriptor& description);
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override;
@@ -22,17 +22,16 @@ namespace NXTN {
 		virtual void SetUniformFloat4(const char* name, const float& f0, const float& f1, const float& f2, const float& f3) override;
 		virtual void SetUniformMat4(const char* name, const mat4& m) override;
 
-		virtual inline const std::vector<Uniform>& GetUniformList() override { return m_Uniforms; };
+		virtual inline const std::vector<Uniform>& GetUniformList() const override { return m_Uniforms; };
+		inline bool IsValid() const { return m_RendererID != 0; }
 
 	private:
-		void Compile();
+		void Compile(const ShaderProgramDescriptor& description);
 
 		int GetUniformPosition(const char* name);
 
 	private:
-		unsigned int m_RendererID;
-
-		std::string m_Filepath;
+		unsigned int m_RendererID = 0;
 
 		std::vector<Uniform> m_Uniforms;
 		std::unordered_map<std::string, int> m_UniformLocations;

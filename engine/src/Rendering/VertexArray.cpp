@@ -1,6 +1,7 @@
 #include "pch.h"
 
-#include "OpenGL/OpenGLVertexArray.h"
+#include "VertexArray.h"
+#include "GraphicsDevice.h"
 
 namespace NXTN {
 	// Vertex Array Layout
@@ -30,38 +31,18 @@ namespace NXTN {
 	// Vertex Array
 	VertexArray* VertexArray::Create(VertexBuffer* vertexBuffer, const VertexArrayLayout& layout)
 	{
-		switch (APISetting::GetGraphicsAPI())
+		GraphicsDevice* device = GraphicsDevice::Get();
+		if (!device)
 		{
-		case GraphicsAPI::None:
-			Log::Error("No rendering API specified");
-			break;
-		case GraphicsAPI::OpenGL:
-			return (VertexArray*) new OpenGLVertexArray(vertexBuffer, layout);
-			break;
-		default:
-			Log::Error("Unsupported rendering API");
-			break;
+			Log::Warning("Graphics device not initialized");
+			return nullptr;
 		}
-
-		return nullptr;
+		return device->CreateVertexArray(vertexBuffer, layout);
 	}
 
 	// Vertex Array
 	VertexArray* VertexArray::Create(VertexBuffer* vertexBuffer, const std::initializer_list<VertexAtrribute>& il)
 	{
-		switch (APISetting::GetGraphicsAPI())
-		{
-		case GraphicsAPI::None:
-			Log::Error("No rendering API specified");
-			break;
-		case GraphicsAPI::OpenGL:
-			return (VertexArray*) new OpenGLVertexArray(vertexBuffer, il);
-			break;
-		default:
-			Log::Error("Unsupported rendering API");
-			break;
-		}
-
-		return nullptr;
+		return Create(vertexBuffer, VertexArrayLayout(il));
 	}
 }

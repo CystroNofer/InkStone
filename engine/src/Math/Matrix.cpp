@@ -197,7 +197,7 @@ namespace NXTN {
 
 	mat4 RotateMat(vec3 angles)
 	{
-		angles *= 0.01745329;
+		angles *= NXTN_DEG_2_RAD_FLOAT;
 		mat4 rotX(1.0f);
 		float sinTheta = sin(angles.x);
 		float cosTheta = cos(angles.x);

@@ -7,6 +7,23 @@
 
 namespace NXTN {
 
+	enum class ShaderStage
+	{
+		Vertex,
+		Fragment
+	};
+
+	struct ShaderStageDescriptor
+	{
+		ShaderStage Stage;
+		std::string Filepath;
+	};
+
+	struct ShaderProgramDescriptor
+	{
+		std::vector<ShaderStageDescriptor> Modules;
+	};
+
 	enum class UniformType
 	{
 		None = 0, Int, Float, Float2, Float3, Float4, Mat4, Bool, Tex2D, TexCube
@@ -33,7 +50,7 @@ namespace NXTN {
 		virtual void SetUniformFloat4(const char* name, const float& f0, const float& f1, const float& f2, const float& f3) = 0;
 		virtual void SetUniformMat4(const char* name, const mat4& m) = 0;
 
-		virtual const std::vector<Uniform>& GetUniformList() = 0;
+		virtual const std::vector<Uniform>& GetUniformList() const = 0;
 	};
 }
 

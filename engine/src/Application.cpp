@@ -76,15 +76,20 @@ namespace NXTN {
 		};
 
 		// Shader
-		m_ShaderHandle = ShaderManager::Load("Asset/Shader/Texture.glsl");
+		m_ShaderHandle = ShaderManager::Load(ShaderProgramDescriptor{
+			{
+				{ ShaderStage::Vertex, "Asset/Shader/Texture.vert" },
+				{ ShaderStage::Fragment, "Asset/Shader/Texture.frag" }
+			}
+		});
 		// Texture
 		m_Texture.reset(Texture2D::Create("Asset/Texture/uv_map_rg_bottom_left_1024.png"));
 
-		//// Scene
+		// Scene
 		m_Registry.reset(new Registry());
 		EntityID id = m_Registry->NewEntity();
 		m_Registry->AddComponent<Transform>(id);
-		m_Registry->AddComponent<Renderable, Mesh*, Handle<Shader>>(
+		m_Registry->AddComponent<Renderable>(
 			id,
 			new Mesh(
 				VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
@@ -122,9 +127,7 @@ namespace NXTN {
 			case EventType::WindowResized:
 			{
 				WindowResizeEvent* e = (WindowResizeEvent*)(event_ptr);
-				//Renderer::ResizeViewport(e.GetNewWidth(), e.GetNewHeight());
 				m_Minimized = e->GetNewWidth() < 1 || e->GetNewHeight() < 1;
-				Renderer::ResizeViewport((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
 				break;
 			}
 			case EventType::MouseScroll:
@@ -180,22 +183,6 @@ namespace NXTN {
 			)
 		);
 
-		// ====================== Rendering ======================
-		m_FrameBuffer->Bind();
-
-		Renderer::SetClearColor(1.0f, 0.0f, 1.0f);
-
-		Renderer::ClearFrameBuffer();
-
-		m_Texture->Bind(0);
-		ShaderManager::Get(m_ShaderHandle)->SetUniformInt("u_MainTex", 0);
-
-		m_SceneRenderer->Run(m_Registry, m_SceneCameraTransform, m_SceneCamera);
-
-		//m_TestScene->Update();
-
-		m_FrameBuffer->Unbind();
-
 		// ====================== UI ======================
 		UI::NewFrame();
 		{
@@ -222,23 +209,17 @@ namespace NXTN {
 					// ImGui sometimes return negative viewport sizes
 					if (viewportSize.x > 0.0f && viewportSize.y > 0.0f)
 					{
-						// Resize if necessary
-						// Note: ImGui seems to only bind the color attachment on ImGui::Image call
-						// And render AFTER ImGui::Render()
-						// Thus, flickering is unavoidable
+						// Resize before rendering so the scene and the UI image use the same size this frame.
 						if (viewportSize.x != m_ViewportSize.x || viewportSize.y != m_ViewportSize.y)
 						{
 							m_ViewportSize = viewportSize;
-							Renderer::ResizeViewport((int)m_ViewportSize.x, (int)m_ViewportSize.y);  // OpenGL viewport
-							m_SceneCamera->ResizeViewport(1.0f, m_ViewportSize.x / m_ViewportSize.y);  // Camera aspect ratio
+							m_SceneCamera->ResizeViewport(m_ViewportSize.x / m_ViewportSize.y);
 							m_FrameBuffer->Resize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);  // Frame buffer size
 						}
+
+						// ImGui records this image now and samples it later in UI::EndFrame().
+						ImGui::Image((ImTextureID)m_FrameBuffer->GetColorAttachment(), viewportSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 					}
-					// Note:
-					// ImGui::Image defines uv0 and uv1 as the top-left and the bottom-right corner
-					// While OpenGL defines uv0 and uv1 as the bottom-left and the top-right corner
-					// The uv0 and uv1 parameters are manully set to fix this
-					ImGui::Image((ImTextureID)m_FrameBuffer->GetColorAttachment(), ImVec2(viewportSize.x, viewportSize.y), ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 				}
 				ImGui::End();
 
@@ -256,6 +237,23 @@ namespace NXTN {
 			}
 			ImGui::End();
 		}
+
+		// ====================== Rendering ======================
+		if (!m_Minimized && m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f)
+		{
+			m_FrameBuffer->Bind();
+
+			Renderer::SetClearColor(1.0f, 0.0f, 1.0f);
+			Renderer::ClearFrameBuffer();
+
+			m_Texture->Bind(0);
+			ShaderManager::Get(m_ShaderHandle)->SetUniformInt("u_MainTex", 0);
+
+			m_SceneRenderer->Run(m_Registry, m_SceneCameraTransform, m_SceneCamera);
+
+			m_FrameBuffer->Unbind();
+		}
+
 		UI::EndFrame();
 
 		WindowManager::Get(m_WindowHandle)->Update();

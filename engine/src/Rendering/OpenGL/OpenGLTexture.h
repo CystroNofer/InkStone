@@ -13,12 +13,14 @@ namespace NXTN {
 		virtual int GetHeight() const override { return m_Height; }
 
 		virtual void Bind(unsigned int slot = 0) const override;
+		inline bool IsValid() const { return m_RendererID != 0; }
 
 	private:
 		std::string m_FilePath;
-		int m_Width, m_Height;
+		int m_Width = 0;
+		int m_Height = 0;
 
-		unsigned int m_RendererID;
+		unsigned int m_RendererID = 0;
 	};
 }
 

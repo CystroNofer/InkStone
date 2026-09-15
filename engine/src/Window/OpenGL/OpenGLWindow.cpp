@@ -22,6 +22,15 @@ namespace NXTN {
 			Log::Error("Failed to initialize GLFW");
 			NXTN_ERROR;
 		}
+
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+#ifdef NXTN_DEBUG
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif
+
 		// Create window and context
 		m_Window = glfwCreateWindow(800, 600, title.c_str(), nullptr, nullptr);
 		if (!m_Window)
@@ -45,6 +54,10 @@ namespace NXTN {
 		{
 			Log::Error("Failed to initialize GLAD");
 			NXTN_ERROR;
+		}
+		if (!GLAD_GL_VERSION_4_5)
+		{
+			Log::Error("OpenGL 4.5 is required");
 		}
 
 		glViewport(0, 0, m_WinData.width, m_WinData.height);

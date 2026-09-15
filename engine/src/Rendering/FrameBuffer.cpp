@@ -1,25 +1,17 @@
 #include "pch.h"
 
-#include "APISetting.h"
-
-#include "OpenGL/OpenGLFrameBuffer.h"
+#include "FrameBuffer.h"
+#include "GraphicsDevice.h"
 
 namespace NXTN {
 	FrameBuffer* FrameBuffer::Create(unsigned int width, unsigned int height)
 	{
-		switch (APISetting::GetGraphicsAPI())
+		GraphicsDevice* device = GraphicsDevice::Get();
+		if (!device)
 		{
-		case GraphicsAPI::None:
-			Log::Error("No rendering API specified");
-			break;
-		case GraphicsAPI::OpenGL:
-			return (FrameBuffer*) new OpenGLFrameBuffer(width, height);
-			break;
-		default:
-			Log::Error("Unsupported rendering API");
-			break;
+			Log::Warning("Graphics device not initialized");
+			return nullptr;
 		}
-
-		return nullptr;
+		return device->CreateFrameBuffer(width, height);
 	}
 }

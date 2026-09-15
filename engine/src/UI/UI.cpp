@@ -1,26 +1,23 @@
 #include "pch.h"
 
-#include "OpenGL/OpenGLUI.h"
+#include "UI.h"
+
+#include "Time.h"
+#include "Window/Window.h"
+#include "Rendering/GraphicsDevice.h"
 
 namespace NXTN {
 	std::unique_ptr<UI> UI::s_UI = nullptr;
 
 	void UI::Init(unsigned int w, unsigned int h)
 	{
-		switch (APISetting::GetGraphicsAPI())
+		GraphicsDevice* device = GraphicsDevice::Get();
+		if (!device)
 		{
-		case GraphicsAPI::None:
-			Log::Error("No rendering API specified");
-			break;
-		case GraphicsAPI::OpenGL:
-			s_UI.reset(new OpenGLUI(w, h));
-			break;
-		default:
-			Log::Error("Unsupported rendering API");
-			break;
+			Log::Warning("Graphics device not initialized");
+			return;
 		}
-
-		return;
+		s_UI.reset(device->CreateUI(w, h));
 	}
 
 	void UI::NewFrame()

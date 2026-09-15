@@ -9,6 +9,9 @@ namespace NXTN {
 		glEnable(GL_BLEND);
 		// Blend function: newColor = inColor * a + bgColor * (1 - a)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
 	}
 
 	void OpenGLRenderer::SetVPMatrixImpl(const mat4& vpMatrix)
@@ -24,7 +27,7 @@ namespace NXTN {
 		m_VPMatrix = mul(ndcCorrection, vpMatrix);
 	}
 
-	void OpenGLRenderer::DrawMeshImpl(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<Shader>& shader, const mat4& mMatrix)
+	void OpenGLRenderer::DrawMeshImpl(const std::shared_ptr<Mesh>& mesh, Shader* const shader, const mat4& mMatrix)
 	{
 		mesh->Bind();
 		shader->Bind();

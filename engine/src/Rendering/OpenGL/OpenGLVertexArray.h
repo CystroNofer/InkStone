@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Rendering/VertexArray.h"
+#include "OpenGLDataBuffer.h"
 
 #include <GLAD/glad.h>
 
@@ -19,8 +20,8 @@ namespace NXTN {
 	class OpenGLVertexArray : public VertexArray
 	{
 	public:
-		OpenGLVertexArray(VertexBuffer* vertexBuffer, const VertexArrayLayout& layout);
-		OpenGLVertexArray(VertexBuffer* vertexBuffer, const std::initializer_list<VertexAtrribute>& il);
+		OpenGLVertexArray(OpenGLVertexBuffer* vertexBuffer, const VertexArrayLayout& layout);
+		OpenGLVertexArray(OpenGLVertexBuffer* vertexBuffer, const std::initializer_list<VertexAtrribute>& il);
 		virtual ~OpenGLVertexArray();
 
 		virtual void Bind() const override;
@@ -28,7 +29,7 @@ namespace NXTN {
 
 	private:
 		unsigned int m_ObjectID;
-		std::shared_ptr<VertexBuffer> m_VertexBuffer;
+		std::shared_ptr<OpenGLVertexBuffer> m_VertexBuffer;
 		VertexArrayLayout m_Layout;
 	};
 }

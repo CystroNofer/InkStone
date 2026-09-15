@@ -13,7 +13,7 @@ namespace NXTN {
 		virtual ~OpenGLRenderer() {}
 
 		virtual void SetVPMatrixImpl(const mat4& vpMatrix) override;
-		virtual void DrawMeshImpl(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<Shader>& shader, const mat4& mMatrix) override;
+		virtual void DrawMeshImpl(const std::shared_ptr<Mesh>& mesh, Shader* const shader, const mat4& mMatrix) override;
 
 		virtual void ResizeViewportImpl(int width, int height) override;
 

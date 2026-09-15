@@ -3,180 +3,153 @@
 #include "OpenGLShader.h"
 
 namespace NXTN {
-	OpenGLShader::OpenGLShader(const std::string& filepath)
-		: m_Filepath(filepath)
+	OpenGLShader::OpenGLShader(const ShaderProgramDescriptor& description)
 	{
-		Compile();
+		Compile(description);
 	}
 
 	OpenGLShader::~OpenGLShader()
 	{
-		glDeleteProgram(m_RendererID);
+		if (m_RendererID != 0)
+		{
+			glDeleteProgram(m_RendererID);
+		}
 	}
 
-	void OpenGLShader::Compile()
+	void OpenGLShader::Compile(const ShaderProgramDescriptor& description)
 	{
-		// Create a program object.
-		m_RendererID = glCreateProgram();
-
-		// File content
-		std::string content;
-		// File stream
-		std::ifstream in(m_Filepath, std::ios::in, std::ios::binary);
-		if (!in)
+		if (description.Modules.empty())
 		{
-			Log::Error("Cannot open shader source at %s", m_Filepath.c_str());
-		}
-
-		// Load file content
-		in.seekg(0, std::ios::end);
-		content.resize(in.tellg());
-		in.seekg(0, std::ios::beg);
-		in.read(&content[0], content.size());
-
-		// Shader handles for each shader
-		std::vector<unsigned int> shaderHandles;
-
-		const char* headerToken = "#type ";
-		// Length of "#type "
-		size_t headerLength = 6;
-
-		size_t start = content.find(headerToken, 0);
-
-		int status = 0;
-		while (start != std::string::npos && start < content.size() - 1)
-		{
-			// Start of shader type
-			start += headerLength;
-			// End of line
-			size_t end = content.find_first_of("\r\n", start);
-			if (end == std::string::npos)
-			{
-				Log::Error("Shader syntax error: No shader type provided");
-				continue;
-			}
-			// Shader type
-			std::string shaderType = content.substr(start, end - start);
-
-			// Shader body
-			start = content.find_first_not_of("\r\n", end);
-			if (start == std::string::npos)
-			{
-				Log::Error("Shader syntax error: No shader body provided");
-				continue;
-			}
-			end = content.find(headerToken, start);
-			if (end == std::string::npos)
-			{
-				end = content.size() - 1;
-			}
-			std::string shaderBody = content.substr(start, end - start);
-
-			// Increment
-			start = end;
-
-			// Create an empty shader handle
-			unsigned int shaderHandle = 0;
-			//std::cout << "#type " << shaderType << std::endl;
-			if (shaderType == "vertex")
-			{
-				shaderHandle = glCreateShader(GL_VERTEX_SHADER);
-			}
-			else if (shaderType == "fragment")
-			{
-				shaderHandle = glCreateShader(GL_FRAGMENT_SHADER);
-			}
-			else
-			{
-				Log::Error("Unsupported shader type: %s", shaderType.c_str());
-				continue;
-			}
-
-			// Send the vertex shader source code to GL
-			// Note that std::string.c_str is NULL character terminated (Idk how this matters but whatever)
-			const char* source = shaderBody.c_str();
-			//std::cout << source << std::endl;
-			glShaderSource(shaderHandle, 1, &source, 0);
-
-			// Compile the vertex shader
-			glCompileShader(shaderHandle);
-
-			// Check compilation status
-			glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &status);
-			if (!status)
-			{
-				// Get log information string length
-				int msgLength = 0;
-				glGetShaderiv(shaderHandle, GL_INFO_LOG_LENGTH, &msgLength);
-
-				// The maxLength includes the NULL character
-				char* msg = (char*)malloc(msgLength * sizeof(char));
-				glGetShaderInfoLog(shaderHandle, msgLength, &msgLength, &msg[0]);
-
-				// Log information
-				Log::Error("Shader (%s) failed to compile: %s", shaderType.c_str(), msg);
-				free(msg);
-
-				// Discard the shader
-				glDeleteShader(shaderHandle);
-
-				continue;
-			}
-
-			// Attach the shaders to the program
-			// Note that once a shader is attached to a program,
-			// Calling glDeleteShader will instead defer the deletion
-			// Until the program attached to is deleted
-			// This is similar shared_ptr, which uses a reference counter
-			glAttachShader(m_RendererID, shaderHandle);
-
-			shaderHandles.push_back(shaderHandle);
-		}
-
-		// Link the program
-		if (shaderHandles.size() > 0)
-		{
-			glLinkProgram(m_RendererID);
-		}
-		else
-		{
-			glDeleteProgram(m_RendererID);
-			Log::Error("No shader compiled, shader program aborted");
-		}
-
-		// Check linking status
-		glGetProgramiv(m_RendererID, GL_LINK_STATUS, &status);
-		if (!status)
-		{
-			// Get log information string length
-			int msgLength = 0;
-			glGetProgramiv(m_RendererID, GL_INFO_LOG_LENGTH, &msgLength);
-
-			// The maxLength includes the NULL character
-			char* msg = (char*)malloc(msgLength * sizeof(char));
-			glGetProgramInfoLog(m_RendererID, msgLength, &msgLength, &msg[0]);
-
-			// Log information
-			Log::Error("Shader program failed to link: %s", msg);
-			free(msg);
-
-			// Delete the program
-			glDeleteProgram(m_RendererID);
-
-			// Delete the shaders
-			for (unsigned int sh : shaderHandles)
-			{
-				glDeleteShader(sh);
-			}
-
+			Log::Warning("Cannot create a shader program without shader modules");
 			return;
 		}
 
-		// Detach the shaders
-		for (unsigned int sh : shaderHandles)
+		unsigned int program = glCreateProgram();
+		if (program == 0)
 		{
-			glDetachShader(m_RendererID, sh);
+			Log::Warning("Failed to create shader program");
+			return;
 		}
+
+		std::vector<unsigned int> shaderHandles;
+		const std::function<void()> discardProgram = [&]()
+			{
+				for (unsigned int shader : shaderHandles)
+				{
+					glDetachShader(program, shader);
+					glDeleteShader(shader);
+				}
+				shaderHandles.clear();
+				glDeleteProgram(program);
+			};
+
+		std::vector<ShaderStage> compiledStages;
+
+		for (const ShaderStageDescriptor& module : description.Modules)
+		{
+			if (std::find(compiledStages.begin(), compiledStages.end(), module.Stage) != compiledStages.end())
+			{
+				Log::Warning("Shader program contains a duplicate shader stage at %s", module.Filepath.c_str());
+				discardProgram();
+				return;
+			}
+
+			GLenum openGLStage = 0;
+			const char* stageName = nullptr;
+			switch (module.Stage)
+			{
+			case ShaderStage::Vertex:
+				openGLStage = GL_VERTEX_SHADER;
+				stageName = "vertex";
+				break;
+			case ShaderStage::Fragment:
+				openGLStage = GL_FRAGMENT_SHADER;
+				stageName = "fragment";
+				break;
+			default:
+				Log::Warning("Unsupported shader stage at %s", module.Filepath.c_str());
+				discardProgram();
+				return;
+			}
+
+			std::ifstream input(module.Filepath, std::ios::in | std::ios::binary);
+			if (!input)
+			{
+				Log::Warning("Cannot open %s shader source at %s", stageName, module.Filepath.c_str());
+				discardProgram();
+				return;
+			}
+
+			std::ostringstream sourceStream;
+			sourceStream << input.rdbuf();
+			if (input.bad())
+			{
+				Log::Warning("Failed to read %s shader source at %s", stageName, module.Filepath.c_str());
+				discardProgram();
+				return;
+			}
+
+			std::string sourceText = sourceStream.str();
+			if (sourceText.empty())
+			{
+				Log::Warning("%s shader source is empty at %s", stageName, module.Filepath.c_str());
+				discardProgram();
+				return;
+			}
+
+			unsigned int shaderHandle = glCreateShader(openGLStage);
+			if (shaderHandle == 0)
+			{
+				Log::Warning("Failed to create %s shader for %s", stageName, module.Filepath.c_str());
+				discardProgram();
+				return;
+			}
+
+			const char* source = sourceText.c_str();
+			glShaderSource(shaderHandle, 1, &source, nullptr);
+			glCompileShader(shaderHandle);
+
+			int status = 0;
+			glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &status);
+			if (!status)
+			{
+				int msgLength = 0;
+				glGetShaderiv(shaderHandle, GL_INFO_LOG_LENGTH, &msgLength);
+				std::vector<char> msg(static_cast<size_t>(std::max(msgLength, 1)));
+				glGetShaderInfoLog(shaderHandle, msgLength, nullptr, msg.data());
+				Log::Warning("%s shader failed to compile at %s: %s", stageName, module.Filepath.c_str(), msg.data());
+				glDeleteShader(shaderHandle);
+				discardProgram();
+				return;
+			}
+
+			glAttachShader(program, shaderHandle);
+			shaderHandles.push_back(shaderHandle);
+			compiledStages.push_back(module.Stage);
+		}
+
+		glLinkProgram(program);
+
+		int status = 0;
+		glGetProgramiv(program, GL_LINK_STATUS, &status);
+		if (!status)
+		{
+			int msgLength = 0;
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &msgLength);
+			std::vector<char> msg(static_cast<size_t>(std::max(msgLength, 1)));
+			glGetProgramInfoLog(program, msgLength, nullptr, msg.data());
+			Log::Warning("Shader program failed to link: %s", msg.data());
+			discardProgram();
+			return;
+		}
+
+		for (unsigned int shader : shaderHandles)
+		{
+			glDetachShader(program, shader);
+			glDeleteShader(shader);
+		}
+		shaderHandles.clear();
+		m_RendererID = program;
 
 		// List shader uniforms
 		int count;

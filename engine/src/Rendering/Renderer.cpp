@@ -1,24 +1,20 @@
 #include "pch.h"
 
-#include "OpenGL/OpenGLRenderer.h"
+#include "Renderer.h"
+#include "GraphicsDevice.h"
 
 namespace NXTN {
 	std::unique_ptr<Renderer> Renderer::s_Renderer = nullptr;
 
 	void Renderer::Init()
 	{
-		switch (APISetting::GetGraphicsAPI())
+		if (!GraphicsDevice::Init())
 		{
-		case GraphicsAPI::None:
-			Log::Error("Invalid API");
-			break;
-		case GraphicsAPI::OpenGL:
-			s_Renderer.reset(new OpenGLRenderer());
-			break;
-		default:
-			Log::Error("Unsupported rendering API");
-			break;
+			Log::Warning("Renderer initialization failed");
+			return;
 		}
+
+		s_Renderer.reset(GraphicsDevice::Get()->CreateRenderer());
 	}
 
 	void Renderer::SetVPMatrix(const mat4& vpMatrix)
@@ -33,7 +29,7 @@ namespace NXTN {
 
 	void Renderer::DrawMesh(
 		const std::shared_ptr<Mesh>& mesh,
-		const std::shared_ptr<Shader>& shader,
+		Shader* const shader,
 		const mat4& mMatrix
 	) {
 		if (!s_Renderer)
@@ -73,21 +69,4 @@ namespace NXTN {
 		}
 		s_Renderer->ClearFrameBufferImpl();
 	}
-
-	//Renderer* Renderer::Create(GraphicsAPI api)
-	//{
-	//	switch (api)
-	//	{
-	//	case GraphicsAPI::None:
-	//		Log::Error("Invalid API");
-	//		break;
-	//	case GraphicsAPI::OpenGL:
-	//		return (Renderer*) new OpenGLRenderer();
-	//	default:
-	//		Log::Error("Unsupported rendering API");
-	//		break;
-	//	}
-
-	//	return nullptr;
-	//}
 }

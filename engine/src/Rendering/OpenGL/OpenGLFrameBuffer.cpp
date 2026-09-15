@@ -8,6 +8,13 @@ namespace NXTN {
 	OpenGLFrameBuffer::OpenGLFrameBuffer(unsigned int width, unsigned int height)
 		: m_Width(width), m_Height(height)
 	{
+		int previousDrawFrameBuffer = 0;
+		int previousReadFrameBuffer = 0;
+		int previousTexture = 0;
+		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousDrawFrameBuffer);
+		glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previousReadFrameBuffer);
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture);
+
 		glCreateFramebuffers(1, &m_RendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
 
@@ -35,10 +42,9 @@ namespace NXTN {
 			Log::Warning("Frame buffer incomplete");
 		}
 
-		// Unbind texture
-		glBindTexture(GL_TEXTURE_2D, 0);
-		// Unbind framebuffer
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindTexture(GL_TEXTURE_2D, previousTexture);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, previousDrawFrameBuffer);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, previousReadFrameBuffer);
 	}
 
 	OpenGLFrameBuffer::~OpenGLFrameBuffer()
@@ -50,6 +56,13 @@ namespace NXTN {
 
 	void OpenGLFrameBuffer::Resize(unsigned int width, unsigned int height)
 	{
+		int previousDrawFrameBuffer = 0;
+		int previousReadFrameBuffer = 0;
+		int previousTexture = 0;
+		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousDrawFrameBuffer);
+		glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previousReadFrameBuffer);
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture);
+
 		m_Width = width;
 		m_Height = height;
 
@@ -73,19 +86,38 @@ namespace NXTN {
 			Log::Warning("Frame buffer incomplete");
 		}
 
-		// Unbind texture
-		glBindTexture(GL_TEXTURE_2D, 0);
-		// Unbind framebuffer
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindTexture(GL_TEXTURE_2D, previousTexture);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, previousDrawFrameBuffer);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, previousReadFrameBuffer);
 	}
 
 	void OpenGLFrameBuffer::Bind() const
 	{
+		if (!m_IsBound)
+		{
+			glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &m_PreviousDrawFrameBuffer);
+			glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_PreviousReadFrameBuffer);
+			glGetIntegerv(GL_VIEWPORT, m_PreviousViewport);
+			m_IsBound = true;
+		}
+
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		glViewport(0, 0, m_Width, m_Height);
 	}
 
 	void OpenGLFrameBuffer::Unbind() const
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		if (!m_IsBound)
+		{
+			return;
+		}
+
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_PreviousDrawFrameBuffer);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_PreviousReadFrameBuffer);
+		glViewport(
+			m_PreviousViewport[0], m_PreviousViewport[1],
+			m_PreviousViewport[2], m_PreviousViewport[3]
+		);
+		m_IsBound = false;
 	}
 }

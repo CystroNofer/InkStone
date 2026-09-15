@@ -8,31 +8,39 @@ namespace NXTN {
 
 	Handle<Window> WindowManager::Create(std::string title)
 	{
-		Window* p;
-		switch (APISetting::GetGraphicsAPI())
+		Window* p = nullptr;
+		switch (APISetting::GetWindowAPI())
 		{
-		case GraphicsAPI::None:
-			Log::Error("No rendering API specified");
+		case WindowAPI::None:
+			Log::Error("No window API specified");
 			break;
-		case GraphicsAPI::OpenGL:
-			p = (Window*)(new OpenGLWindow(title));
+		case WindowAPI::GLFW:
+			if (APISetting::GetGraphicsAPI() == GraphicsAPI::OpenGL)
+			{
+				p = new OpenGLWindow(title);
+			}
+			else
+			{
+				Log::Error("Unsupported graphics API for GLFW window");
+			}
 			break;
 		default:
-			Log::Error("Unsupported rendering API");
+			Log::Error("Unsupported window API");
 			break;
 		}
 		
 		if (p) {
-			s_LastFocusedHandle = s_Windows.Add(p);
+			Handle<Window> handle = s_Windows.Add(p);
+			s_LastFocusedHandle = handle;
 
-			p->SetFocusedCallback([](bool focused) {
-				OnFocused(s_LastFocusedHandle, focused);
+			p->SetFocusedCallback([handle](bool focused) {
+				OnFocused(handle, focused);
 			});
 
-			return s_LastFocusedHandle;
+			return handle;
 		}
 
-		return Handle<Window>::invalid;
+		return Handle<Window>();
 	}
 
 	Window* WindowManager::Get(Handle<Window>& wh) {

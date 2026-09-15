@@ -16,10 +16,10 @@ namespace NXTN {
 
 		// Static
 		static void SetVPMatrix(const mat4& vpMatrix);
-		static void DrawMesh(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<Shader>& shader, const mat4& mMatrix);
+		static void DrawMesh(const std::shared_ptr<Mesh>& mesh, Shader* const shader, const mat4& mMatrix);
 
 		static void ResizeViewport(int width, int height);
-		
+
 		static void SetClearColor(float r, float g, float b);
 		static void ClearFrameBuffer();
 
@@ -28,7 +28,7 @@ namespace NXTN {
 	protected:
 		// Virtual
 		virtual void SetVPMatrixImpl(const mat4& vpMatrix) = 0;
-		virtual void DrawMeshImpl(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<Shader>& shader, const mat4& mMatrix) = 0;
+		virtual void DrawMeshImpl(const std::shared_ptr<Mesh>& mesh, Shader* const shader, const mat4& mMatrix) = 0;
 
 		virtual void ResizeViewportImpl(int width, int height) = 0;
 

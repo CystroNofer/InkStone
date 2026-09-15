@@ -11,15 +11,10 @@ namespace NXTN {
 		size_t id = SIZE_MAX;
 		uint32_t gen = 0u;
 
-		static const Handle invalid;
-
 		bool operator==(const Handle<T>& h) const {
 			return h.id == id && h.gen == gen;
 		}
 	};
-
-	template <typename T>
-	inline constexpr Handle<T> Handle<T>::invalid = { SIZE_MAX, 0 };
 
 	template <typename T>
 	class HandleMap {

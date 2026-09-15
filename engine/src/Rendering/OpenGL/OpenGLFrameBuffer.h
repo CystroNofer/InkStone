@@ -3,7 +3,7 @@
 #include "Rendering/FrameBuffer.h"
 
 namespace NXTN {
-	class OpenGLFrameBuffer : FrameBuffer
+	class OpenGLFrameBuffer : public FrameBuffer
 	{
 	public:
 		OpenGLFrameBuffer(unsigned int width, unsigned int height);
@@ -24,5 +24,10 @@ namespace NXTN {
 		unsigned int m_Width, m_Height;
 		unsigned int m_ColorAttachment;
 		unsigned int m_DepthStencilAttachment;
+
+		mutable int m_PreviousDrawFrameBuffer = 0;
+		mutable int m_PreviousReadFrameBuffer = 0;
+		mutable int m_PreviousViewport[4] = { 0, 0, 0, 0 };
+		mutable bool m_IsBound = false;
 	};
 }

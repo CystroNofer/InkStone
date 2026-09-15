@@ -1,32 +1,26 @@
 #include "pch.h"
 
-#include "APISetting.h"
-#include "Rendering/OpenGL/OpenGLShader.h"
+#include "Rendering/GraphicsDevice.h"
 #include "ShaderManager.h"
 
 namespace NXTN {
 	HandleMap<Shader> ShaderManager::s_Map;
 
-	Handle<Shader> ShaderManager::Load(const std::string& path) {
-		Shader* p = nullptr;
-		switch (APISetting::GetGraphicsAPI())
+	Handle<Shader> ShaderManager::Load(const ShaderProgramDescriptor& description) {
+		GraphicsDevice* device = GraphicsDevice::Get();
+		if (!device)
 		{
-		case GraphicsAPI::None:
-			Log::Error("No rendering API specified");
-			break;
-		case GraphicsAPI::OpenGL:
-			p = (Shader*)(new OpenGLShader(path));
-			break;
-		default:
-			Log::Error("Unsupported rendering API");
-			break;
+			Log::Warning("Graphics device not initialized");
+			return Handle<Shader>();
 		}
+
+		Shader* p = device->CreateShader(description);
 
 		if (p) {
 			return s_Map.Add(p);
 		}
 
-		return Handle<Shader>::invalid;
+		return Handle<Shader>();
 	}
 
 	Shader* ShaderManager::Get(Handle<Shader> sh) {

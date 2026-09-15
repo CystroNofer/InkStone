@@ -6,6 +6,8 @@ namespace NXTN {
 	class Texture
 	{
 	public:
+		virtual ~Texture() = default;
+
 		virtual int GetWidth() const = 0;
 		virtual int GetHeight() const = 0;
 

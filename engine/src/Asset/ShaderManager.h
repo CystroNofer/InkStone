@@ -10,7 +10,7 @@ namespace NXTN {
 	public:
 		~ShaderManager() {}
 
-		static Handle<Shader> Load(const std::string& path);
+		static Handle<Shader> Load(const ShaderProgramDescriptor& description);
 		static Shader* Get(Handle<Shader> sh);
 		static bool Validate(Handle<Shader> sh);
 

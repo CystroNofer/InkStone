@@ -3,6 +3,9 @@
 #include "OpenGLUI.h"
 
 #include "Input/Keycode.h"
+#include "Event/ApplicationEvent.h"
+#include "Event/KeyEvent.h"
+#include "Event/MouseEvent.h"
 
 namespace NXTN {
 	OpenGLUI::OpenGLUI(unsigned int w, unsigned int h)
@@ -19,7 +22,7 @@ namespace NXTN {
 
 		if (io.BackendRendererUserData == nullptr)
 		{
-			ImGui_ImplOpenGL3_Init("#version 410");
+			ImGui_ImplOpenGL3_Init("#version 450 core");
 		}
 
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;  // Enable cursor functionalities defined by backend
