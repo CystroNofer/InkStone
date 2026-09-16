@@ -12,16 +12,15 @@ namespace NXTN {
 
 	}
 
-	EntityID Registry::NewEntity() {
+	EntityID Registry::NewEntity(std::string name) {
 		// No recycled ID
 		if (m_RecycledEntityIDs.empty()) {
 			size_t i = m_Generations.size();
-			if (i > UINT32_MAX) {
-				Log::Error("Entity count exceeds UINT32_MAX");
-			}
 			m_Generations.push_back(0);
 
 			Log::Info("New entity: ID %d, Gen 0", i);
+
+			AddComponent<NameTag>(static_cast<EntityID>(i), name);
 
 			return static_cast<EntityID>(i);
 		}
@@ -31,6 +30,8 @@ namespace NXTN {
 		// Generation already incremented when destroyed
 
 		Log::Info("New entity: ID %d, Gen %d", i, m_Generations[i]);
+
+		AddComponent<NameTag>(static_cast<EntityID>(i), name);
 
 		return static_cast<EntityID>(i);
 	}
@@ -43,7 +44,7 @@ namespace NXTN {
 		if (e.generation < m_Generations[e.id]) {
 			return;
 		}
-		for (std::unique_ptr<IComponentStorage>& storagePtr : m_Components) {
+		for (std::unique_ptr<IComponentStorage>& storagePtr : m_ComponentStorages) {
 			storagePtr->Remove(e.id);
 		}
 		m_RecycledEntityIDs.push_back(e.id);

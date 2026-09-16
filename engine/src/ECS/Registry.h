@@ -2,6 +2,7 @@
 
 #include "Container/SparseSet.h"
 #include "Scene.h"  // Contains E and C
+#include "Gameplay/Component/NameTag.h"
 
 namespace NXTN {
 	// Callback constraint for Each()
@@ -22,7 +23,7 @@ namespace NXTN {
 		virtual ~IComponentStorage() {}
 		virtual size_t Size() const noexcept = 0;
 		virtual bool Has(EntityID eid) const = 0;
-		virtual void Add(EntityID eid) = 0;
+		virtual bool Add(EntityID eid) = 0;
 		virtual void Remove(EntityID eid) = 0;
 		virtual const std::vector<uint32_t>& Keys() const = 0;
 
@@ -45,8 +46,12 @@ namespace NXTN {
 			return m_Set.Get(eid);
 		}
 
-		virtual void Add(EntityID eid) override {
+		virtual bool Add(EntityID eid) override {
+			if (C::UNIQUE_PER_ENTITY && m_Set.Has(eid)) {
+				return false;
+			}
 			m_Set.Add(eid);
+			return false;
 		}
 
 		template <typename... Args>
@@ -74,23 +79,31 @@ namespace NXTN {
 		Registry();
 		~Registry();
 
-		EntityID NewEntity();
+		EntityID NewEntity(std::string name = "Unnamed Object");
+
+		template <typename... Ts>
+			requires ((IsComponent<Ts> && ...) && (std::default_initializable<Ts> && ...))
+		EntityID NewEntity(std::string name = "Unnamed Object") {
+			EntityID id = NewEntity(name);
+			AddComponent<Ts...>(id);
+			return id;
+		}
 
 		void DestroyEntity(Entity& e);
 
 		template <typename C>
 			requires (IsComponent<C>)
-		void AddComponent(EntityID eid) {
+		bool AddComponent(EntityID eid) {
 			ComponentID cid = ComponentIDOf<C>();
 
-			if (cid >= m_Components.size()) {
-				m_Components.resize(cid + 1);
-				m_Components[cid].reset(new ComponentStorage<C>);
+			if (cid >= m_ComponentStorages.size()) {
+				m_ComponentStorages.resize(cid + 1);
+				m_ComponentStorages[cid].reset(new ComponentStorage<C>);
 			}
-			else if (m_Components[cid] == nullptr) {
-				m_Components[cid].reset(new ComponentStorage<C>);
+			else if (m_ComponentStorages[cid] == nullptr) {
+				m_ComponentStorages[cid].reset(new ComponentStorage<C>);
 			}
-			m_Components[cid]->Add(eid);
+			return m_ComponentStorages[cid]->Add(eid);
 		}
 
 		template <typename C, typename... Args>
@@ -98,18 +111,19 @@ namespace NXTN {
 		void AddComponent(EntityID eid, Args&&... args) {
 			ComponentID cid = ComponentIDOf<C>();
 
-			if (cid >= m_Components.size()) {
-				m_Components.resize(cid + 1);
-				m_Components[cid].reset(new ComponentStorage<C>);
+			if (cid >= m_ComponentStorages.size()) {
+				m_ComponentStorages.resize(cid + 1);
+				m_ComponentStorages[cid].reset(new ComponentStorage<C>);
 			}
-			else if (m_Components[cid] == nullptr) {
-				m_Components[cid].reset(new ComponentStorage<C>);
+			else if (m_ComponentStorages[cid] == nullptr) {
+				m_ComponentStorages[cid].reset(new ComponentStorage<C>);
 			}
-			static_cast<ComponentStorage<C>*>(m_Components[cid].get())->Emplace(eid, std::forward<Args>(args)...);
+			static_cast<ComponentStorage<C>*>(m_ComponentStorages[cid].get())->
+				Emplace(eid, std::forward<Args>(args)...);
 		}
 
 		template <typename... Cs, typename F>
-			requires (IsComponentCallback<F, Cs...> && UniqueComponent<Cs...>::value)
+			requires (IsComponentCallback<F, Cs...>&& UniqueComponent<Cs...>::value)
 		void Each(F&& callback) {
 			// Retrieve storages
 			constexpr size_t kCs = sizeof...(Cs);
@@ -154,10 +168,10 @@ namespace NXTN {
 		ComponentStorage<C>* TryGetStorage() {
 			ComponentID cid = ComponentIDOf<C>();
 
-			if (cid >= m_Components.size()) {
+			if (cid >= m_ComponentStorages.size()) {
 				return nullptr;
 			}
-			return static_cast<ComponentStorage<C>*>(m_Components[cid].get());
+			return static_cast<ComponentStorage<C>*>(m_ComponentStorages[cid].get());
 		}
 
 		template <typename C>
@@ -165,14 +179,14 @@ namespace NXTN {
 		ComponentStorage<C>* GetOrCreateStorage() {
 			ComponentID cid = ComponentIDOf<C>();
 
-			if (cid >= m_Components.size()) {
-				m_Components.resize(cid + 1);
-				m_Components[cid].reset(new ComponentStorage<C>);
+			if (cid >= m_ComponentStorages.size()) {
+				m_ComponentStorages.resize(cid + 1);
+				m_ComponentStorages[cid].reset(new ComponentStorage<C>);
 			}
-			else if (m_Components[cid] == nullptr) {
-				m_Components[cid].reset(new ComponentStorage<C>);
+			else if (m_ComponentStorages[cid] == nullptr) {
+				m_ComponentStorages[cid].reset(new ComponentStorage<C>);
 			}
-			return static_cast<ComponentStorage<C>*>(m_Components[cid].get());
+			return static_cast<ComponentStorage<C>*>(m_ComponentStorages[cid].get());
 		}
 
 		// For entity ID
@@ -180,7 +194,7 @@ namespace NXTN {
 		std::vector<GenerationID> m_Generations;
 
 		// Component storage
-		std::vector<std::unique_ptr<IComponentStorage>> m_Components;
+		std::vector<std::unique_ptr<IComponentStorage>> m_ComponentStorages;
 	};
 }
 

@@ -12,6 +12,8 @@ namespace NXTN {
 	constexpr ComponentID COMPONENT_ID_MAX = UINT32_MAX;
 
 	class BaseComponent {
+	public:
+		static constexpr bool UNIQUE_PER_ENTITY = true;
 	protected:
 		virtual ~BaseComponent() = default;
 	};

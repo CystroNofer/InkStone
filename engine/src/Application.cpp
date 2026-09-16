@@ -87,8 +87,7 @@ namespace NXTN {
 
 		// Scene
 		m_Registry.reset(new Registry());
-		EntityID id = m_Registry->NewEntity();
-		m_Registry->AddComponent<Transform>(id);
+		EntityID id = m_Registry->NewEntity<Transform>("Test Entity");
 		m_Registry->AddComponent<Renderable>(
 			id,
 			new Mesh(
