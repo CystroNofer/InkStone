@@ -29,8 +29,8 @@ namespace NXTN {
 					return { i, m_Map[i].first };
 				}
 			}
-			m_Map.push_back({ 1, std::unique_ptr<T>(itemPtr) });
-			return { m_Map.size() - 1, 1 };
+			m_Map.push_back({ 0u, std::unique_ptr<T>(itemPtr) });
+			return { m_Map.size() - 1, 0u };
 		}
 
 		bool Validate(Handle<T> handle) {
