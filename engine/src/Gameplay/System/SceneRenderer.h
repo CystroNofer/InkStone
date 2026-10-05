@@ -16,12 +16,6 @@ namespace NXTN {
 		void Run(std::unique_ptr<Registry>& registry, std::shared_ptr<Transform> ct, std::shared_ptr<Camera> c);
 
 	private:
-		struct RenderItem {
-			std::shared_ptr<Mesh> meshRef;
-			Handle<Shader> shaderHandle;
-			mat4 mMatrix;
-		};
-
 		mat4 GetVMatrix(std::shared_ptr<Transform> camT);
 	};
 }

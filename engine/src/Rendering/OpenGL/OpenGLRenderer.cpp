@@ -27,18 +27,35 @@ namespace NXTN {
 		m_VPMatrix = mul(ndcCorrection, vpMatrix);
 	}
 
-	void OpenGLRenderer::DrawMeshImpl(const std::shared_ptr<Mesh>& mesh, Shader* const shader, const mat4& mMatrix)
+	void OpenGLRenderer::DrawMeshImpl(std::vector<RenderItem>& renderItems)
 	{
-		mesh->Bind();
-		shader->Bind();
+		// TODO: Sort with other criterias
+		std::ranges::sort(
+			renderItems,
+			[](const RenderItem& left, const RenderItem& right)
+			{
+				return std::tie(left.materialHandle.id, left.materialHandle.gen)
+					< std::tie(right.materialHandle.id, right.materialHandle.gen);
+			}
+		);
 
-		shader->SetUniformMat4("u_ModelMatrix", mMatrix);
-		shader->SetUniformMat4("u_VPMatrix", m_VPMatrix);
+		Handle<Material> lastMaterialHandle;
+		for (const RenderItem& item : renderItems)
+		{
+			Material& material = *MaterialManager::Get(item.materialHandle);
+			if (item.materialHandle != lastMaterialHandle)
+			{
+				material.Bind();
+			}
+			item.meshRef->Bind();
 
-		glDrawElements(GL_TRIANGLES, mesh->GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
+			material.SetUniformMat4("u_ModelMatrix", item.mMatrix);
+			material.SetUniformMat4("u_VPMatrix", m_VPMatrix);
 
-		mesh->Unbind();
-		shader->Unbind();
+			glDrawElements(GL_TRIANGLES, item.meshRef->GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
+
+			item.meshRef->Unbind();
+		}
 	}
 
 	void OpenGLRenderer::ResizeViewportImpl(int width, int height)

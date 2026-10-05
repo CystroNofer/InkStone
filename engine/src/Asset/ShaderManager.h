@@ -5,7 +5,6 @@
 #include "Rendering/Shader.h"
 
 namespace NXTN {
-	// No need for polymorphism
 	class ShaderManager {
 	public:
 		~ShaderManager() {}

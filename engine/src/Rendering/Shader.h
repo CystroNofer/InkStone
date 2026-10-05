@@ -3,6 +3,7 @@
 #include "Core.h"
 
 #include "Log.h"
+#include "Texture.h"
 #include "Math/Math.h"
 
 namespace NXTN {
@@ -15,24 +16,24 @@ namespace NXTN {
 
 	struct ShaderStageDescriptor
 	{
-		ShaderStage Stage;
-		std::string Filepath;
+		ShaderStage stage;
+		std::string filepath;
 	};
 
 	struct ShaderProgramDescriptor
 	{
-		std::vector<ShaderStageDescriptor> Modules;
+		std::vector<ShaderStageDescriptor> stages;
 	};
 
-	enum class UniformType
+	enum class ShaderUniformType
 	{
-		None = 0, Int, Float, Float2, Float3, Float4, Mat4, Bool, Tex2D, TexCube
+		ErrorType = 0, Int, UInt, Float, Float2, Float3, Float4, Mat4, Bool, Tex2D, TexCube
 	};
 
-	struct Uniform
+	struct ShaderUniformDescriptor
 	{
-		UniformType type;
 		std::string name;
+		ShaderUniformType type;
 	};
 
 	class Shader
@@ -43,14 +44,17 @@ namespace NXTN {
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		virtual void SetUniformInt(const char* name, const int& i) = 0;
-		virtual void SetUniformUInt(const char* name, const unsigned int& i) = 0;
-		virtual void SetUniformFloat(const char* name, const float& f) = 0;
-		virtual void SetUniformFloat3(const char* name, const float& f0, const float& f1, const float& f2) = 0;
-		virtual void SetUniformFloat4(const char* name, const float& f0, const float& f1, const float& f2, const float& f3) = 0;
-		virtual void SetUniformMat4(const char* name, const mat4& m) = 0;
+		virtual void SetUniformInt(const std::string& name, int i) = 0;
+		virtual void SetUniformUInt(const std::string& name, unsigned int i) = 0;
+		virtual void SetUniformFloat(const std::string& name, float f) = 0;
+		virtual void SetUniformFloat3(const std::string& name, const vec3& f3) = 0;
+		virtual void SetUniformFloat3(const std::string& name, float f0, float f1, float f2) = 0;
+		virtual void SetUniformFloat4(const std::string& name, const vec4& f4) = 0;
+		virtual void SetUniformFloat4(const std::string& name, float f0, float f1, float f2, float f3) = 0;
+		virtual void SetUniformMat4(const std::string& name, const mat4& m) = 0;
+		virtual void SetUniformTex2D(const std::string& name, unsigned int slot) = 0;
 
-		virtual const std::vector<Uniform>& GetUniformList() const = 0;
+		virtual std::vector<ShaderUniformDescriptor> GetUniformList() const = 0;
 	};
 }
 

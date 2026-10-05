@@ -17,7 +17,7 @@ project "engine"
 	-- kind "StaticLib"
 	kind "ConsoleApp"
 	language "C++"
-	cppdialect "C++20"
+	cppdialect "C++23"
 	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -75,7 +75,7 @@ project "engine"
 -- 	location "InkStoneEditor"
 -- 	kind "ConsoleApp"
 -- 	language "C++"
--- 	cppdialect "C++20"
+-- 	cppdialect "C++23"
 -- 	staticruntime "on"
 	
 -- 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -113,7 +113,7 @@ project "engine"
 -- 	location "Sandbox"
 -- 	kind "ConsoleApp"
 -- 	language "C++"
--- 	cppdialect "C++20"
+-- 	cppdialect "C++23"
 -- 	staticruntime "on"
 	
 -- 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")

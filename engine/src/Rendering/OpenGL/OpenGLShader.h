@@ -5,6 +5,11 @@
 #include <GLAD/glad.h>
 
 namespace NXTN {
+	struct OpenGLShaderUniformInfo
+	{
+		ShaderUniformType type;
+		GLint location;
+	};
 
 	class OpenGLShader : public Shader
 	{
@@ -15,26 +20,29 @@ namespace NXTN {
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
-		virtual void SetUniformInt(const char* name, const int& i) override;
-		virtual void SetUniformUInt(const char* name, const unsigned int& i) override;
-		virtual void SetUniformFloat(const char* name, const float& f) override;
-		virtual void SetUniformFloat3(const char* name, const float& f0, const float& f1, const float& f2) override;
-		virtual void SetUniformFloat4(const char* name, const float& f0, const float& f1, const float& f2, const float& f3) override;
-		virtual void SetUniformMat4(const char* name, const mat4& m) override;
+		virtual void SetUniformInt(const std::string& name, int i) override;
+		virtual void SetUniformUInt(const std::string& name, unsigned int i) override;
+		virtual void SetUniformFloat(const std::string& name, float f) override;
+		virtual void SetUniformFloat3(const std::string& name, const vec3& f3) override;
+		virtual void SetUniformFloat3(const std::string& name, float f0, float f1, float f2) override;
+		virtual void SetUniformFloat4(const std::string& name, const vec4& f4) override;
+		virtual void SetUniformFloat4(const std::string& name, float f0, float f1, float f2, float f3) override;
+		virtual void SetUniformMat4(const std::string& name, const mat4& m) override;
+		virtual void SetUniformTex2D(const std::string& name, unsigned int slot) override;
 
-		virtual inline const std::vector<Uniform>& GetUniformList() const override { return m_Uniforms; };
+		virtual inline std::vector<ShaderUniformDescriptor> GetUniformList() const override;
 		inline bool IsValid() const { return m_RendererID != 0; }
 
 	private:
 		void Compile(const ShaderProgramDescriptor& description);
 
-		int GetUniformPosition(const char* name);
+		GLint GetUniformPosition(const std::string& name);
 
 	private:
 		unsigned int m_RendererID = 0;
 
-		std::vector<Uniform> m_Uniforms;
-		std::unordered_map<std::string, int> m_UniformLocations;
+		// std::vector<ShaderUniformDescriptor> m_Uniforms;
+		std::unordered_map<std::string, OpenGLShaderUniformInfo> m_UniformInfo;
 	};
 }
 

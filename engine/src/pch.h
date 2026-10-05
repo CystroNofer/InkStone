@@ -14,12 +14,15 @@
 #include <functional>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <mutex>
+#include <ranges>
 //#include <regex>
 #include <sstream>
 #include <typeindex>
 #include <utility>
+#include <variant>
 
 // Data structure
 #include <array>
@@ -31,4 +34,3 @@
 
 // Misc
 #include <cstddef>
-#include <limits>

@@ -17,22 +17,14 @@ namespace NXTN {
 
 		registry->Each<Transform, Renderable>([&](EntityID _, Transform& t, Renderable& r)
 			{
-				if (
-					r.meshRef &&
-					ShaderManager::Validate(r.shaderHandle)
-				) {
-					renderItems.emplace_back(r.meshRef, r.shaderHandle, t.GetMMatrix());
+				if (r.meshRef)
+				{
+					renderItems.emplace_back(r.meshRef, r.materialHandle, t.GetMMatrix());
 				}
 			}
 		);
 
-		for (RenderItem& i : renderItems) {
-			Renderer::DrawMesh(
-				i.meshRef,
-				ShaderManager::Get(i.shaderHandle),
-				i.mMatrix
-			);
-		}
+		Renderer::DrawMesh(renderItems);
 	}
 
 	mat4 SceneRenderer::GetVMatrix(std::shared_ptr<Transform> camT) {

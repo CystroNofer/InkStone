@@ -75,15 +75,16 @@ namespace NXTN {
 			0, 3, 2
 		};
 
-		// Shader
-		m_ShaderHandle = ShaderManager::Load(ShaderProgramDescriptor{
+		// Shader, Material, and Texture
+		m_MaterialHandle = MaterialManager::Create(ShaderManager::Load(ShaderProgramDescriptor{
 			{
 				{ ShaderStage::Vertex, "Asset/Shader/Texture.vert" },
 				{ ShaderStage::Fragment, "Asset/Shader/Texture.frag" }
 			}
-		});
-		// Texture
-		m_Texture.reset(Texture2D::Create("Asset/Texture/uv_map_rg_bottom_left_1024.png"));
+		}));
+		MaterialManager::Get(m_MaterialHandle)->SetUniformTex2D(
+			"u_MainTex", TextureManager::Create("Asset/Texture/uv_map_rg_bottom_left_1024.png")
+		);
 
 		// Scene
 		m_Registry.reset(new Registry());
@@ -94,7 +95,7 @@ namespace NXTN {
 				VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
 				IndexBuffer::Create(indices, 6)
 			),
-			m_ShaderHandle
+			m_MaterialHandle
 		);
 
 		m_SceneRenderer.reset(new SceneRenderer());
@@ -244,9 +245,6 @@ namespace NXTN {
 
 			Renderer::SetClearColor(1.0f, 0.0f, 1.0f);
 			Renderer::ClearFrameBuffer();
-
-			m_Texture->Bind(0);
-			ShaderManager::Get(m_ShaderHandle)->SetUniformInt("u_MainTex", 0);
 
 			m_SceneRenderer->Run(m_Registry, m_SceneCameraTransform, m_SceneCamera);
 

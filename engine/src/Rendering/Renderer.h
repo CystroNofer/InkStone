@@ -6,9 +6,15 @@
 #include "APISetting.h"
 
 #include "Mesh.h"
-#include "Shader.h"
+#include "Asset/MaterialManager.h"
 
 namespace NXTN {
+	struct RenderItem {
+		std::shared_ptr<Mesh> meshRef;
+		Handle<Material> materialHandle;
+		mat4 mMatrix;
+	};
+
 	class Renderer
 	{
 	public:
@@ -16,7 +22,7 @@ namespace NXTN {
 
 		// Static
 		static void SetVPMatrix(const mat4& vpMatrix);
-		static void DrawMesh(const std::shared_ptr<Mesh>& mesh, Shader* const shader, const mat4& mMatrix);
+		static void DrawMesh(std::vector<RenderItem>& renderItems);
 
 		static void ResizeViewport(int width, int height);
 
@@ -28,7 +34,7 @@ namespace NXTN {
 	protected:
 		// Virtual
 		virtual void SetVPMatrixImpl(const mat4& vpMatrix) = 0;
-		virtual void DrawMeshImpl(const std::shared_ptr<Mesh>& mesh, Shader* const shader, const mat4& mMatrix) = 0;
+		virtual void DrawMeshImpl(std::vector<RenderItem>& renderItems) = 0;
 
 		virtual void ResizeViewportImpl(int width, int height) = 0;
 
