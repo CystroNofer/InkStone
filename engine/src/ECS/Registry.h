@@ -51,7 +51,7 @@ namespace NXTN {
 				return false;
 			}
 			m_Set.Add(eid);
-			return false;
+			return true;
 		}
 
 		template <typename... Args>
