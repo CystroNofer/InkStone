@@ -78,12 +78,12 @@ namespace NXTN {
 		// Shader, Material, and Texture
 		m_MaterialHandle = MaterialManager::Create(ShaderManager::Load(ShaderProgramDescriptor{
 			{
-				{ ShaderStage::Vertex, "Asset/Shader/Texture.vert" },
-				{ ShaderStage::Fragment, "Asset/Shader/Texture.frag" }
+				{ ShaderStage::Vertex, "../Asset/Shader/Texture.vert" },
+				{ ShaderStage::Fragment, "../Asset/Shader/Texture.frag" }
 			}
 		}));
 		MaterialManager::Get(m_MaterialHandle)->SetUniformTex2D(
-			"u_MainTex", TextureManager::Create("Asset/Texture/uv_map_rg_bottom_left_1024.png")
+			"u_MainTex", TextureManager::Create("../Asset/Texture/uv_map_rg_bottom_left_1024.png")
 		);
 
 		// Scene
