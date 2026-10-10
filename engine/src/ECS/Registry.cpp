@@ -12,36 +12,32 @@ namespace NXTN {
 
 	}
 
-	EntityID Registry::NewEntity(std::string name) {
+	Entity Registry::NewEntity(std::string name) {
+		EntityID i;
 		// No recycled ID
 		if (m_RecycledEntityIDs.empty()) {
-			size_t i = m_Generations.size();
+			i = static_cast<EntityID>(m_Generations.size());
 			m_Generations.push_back(0);
-
-			Log::Info("New entity: ID %d, Gen 0", i);
-
-			AddComponent<NameTag>(static_cast<EntityID>(i), name);
-
-			return static_cast<EntityID>(i);
 		}
 		// Reuse ID
-		EntityID i = m_RecycledEntityIDs.back();
-		m_RecycledEntityIDs.pop_back();
-		// Generation already incremented when destroyed
+		else
+		{
+			EntityID i = m_RecycledEntityIDs.back();
+			m_RecycledEntityIDs.pop_back();
+			// Generation already incremented when destroyed
+		}
+		Entity e{ i, 0 };
 
 		Log::Info("New entity: ID %d, Gen %d", i, m_Generations[i]);
 
-		AddComponent<NameTag>(static_cast<EntityID>(i), name);
+		AddComponent<NameTag>(e, name);
 
-		return static_cast<EntityID>(i);
+		return e;
 	}
 
 	void Registry::DestroyEntity(Entity& e) {
-		if (e.id >= m_Generations.size()) {
-			Log::Error("Invalid entity ID");
-		}
-		// Stale entity
-		if (e.generation < m_Generations[e.id]) {
+		if (!IsAlive(e)) {
+			Log::Warning("Stale entity %d, gen %d\n", e.id, e.generation);
 			return;
 		}
 		for (std::unique_ptr<IComponentStorage>& storagePtr : m_ComponentStorages) {

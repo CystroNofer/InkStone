@@ -4,6 +4,9 @@
 #include "Scene.h"  // Contains E and C
 #include "Gameplay/Component/NameTag.h"
 
+#include "Log.h"
+
+
 namespace NXTN {
 	// Callback constraint for Each()
 	template <typename F, typename... Cs>
@@ -22,12 +25,10 @@ namespace NXTN {
 	public:
 		virtual ~IComponentStorage() {}
 		virtual size_t Size() const noexcept = 0;
-		virtual bool Has(EntityID eid) const = 0;
-		virtual bool Add(EntityID eid) = 0;
-		virtual void Remove(EntityID eid) = 0;
+		virtual bool Has(EntityID id) const = 0;
+		virtual void Add(EntityID id) = 0;
+		virtual void Remove(EntityID id) = 0;
 		virtual const std::vector<uint32_t>& Keys() const = 0;
-
-	private:
 	};
 
 	template <typename C>
@@ -38,29 +39,25 @@ namespace NXTN {
 			return m_Set.Size();
 		}
 
-		virtual bool Has(EntityID eid) const override {
-			return m_Set.Has(eid);
+		virtual bool Has(EntityID id) const override {
+			return m_Set.Has(id);
 		}
 
-		C& Get(EntityID eid) {
-			return m_Set.Get(eid);
+		C& Get(EntityID id) {
+			return m_Set.Get(id);
 		}
 
-		virtual bool Add(EntityID eid) override {
-			if (C::UNIQUE_PER_ENTITY && m_Set.Has(eid)) {
-				return false;
-			}
-			m_Set.Add(eid);
-			return true;
+		virtual void Add(EntityID id) override {
+			m_Set.Add(id);
 		}
 
 		template <typename... Args>
-		void Emplace(EntityID eid, Args&&... args) {
-			m_Set.Emplace(eid, std::forward<Args>(args)...);
+		void Emplace(EntityID id, Args&&... args) {
+			m_Set.Emplace(id, std::forward<Args>(args)...);
 		}
 
-		virtual void Remove(EntityID eid) override {
-
+		virtual void Remove(EntityID id) override {
+			m_Set.Remove(id);
 		}
 
 		virtual const std::vector<uint32_t>& Keys() const override {
@@ -79,21 +76,29 @@ namespace NXTN {
 		Registry();
 		~Registry();
 
-		EntityID NewEntity(std::string name = "Unnamed Object");
+		Entity NewEntity(std::string name = "Unnamed Object");
 
 		template <typename... Ts>
 			requires ((IsComponent<Ts> && ...) && (std::default_initializable<Ts> && ...))
-		EntityID NewEntity(std::string name = "Unnamed Object") {
-			EntityID id = NewEntity(name);
-			AddComponent<Ts...>(id);
-			return id;
+		Entity NewEntity(std::string name = "Unnamed Object") {
+			Entity entity = NewEntity(name);
+			AddComponent<Ts...>(entity);
+			return entity;
+		}
+
+		inline bool IsAlive(Entity e) const {
+			return e.id < m_Generations.size() && m_Generations[e.id] == e.generation;
 		}
 
 		void DestroyEntity(Entity& e);
 
 		template <typename C>
 			requires (IsComponent<C>)
-		bool AddComponent(EntityID eid) {
+		bool AddComponent(Entity e) {
+			if (!IsAlive(e)) {
+				Log::Warning("Stale entity %d, gen %d\n", e.id, e.generation);
+				return false;
+			}
 			ComponentID cid = ComponentIDOf<C>();
 
 			if (cid >= m_ComponentStorages.size()) {
@@ -103,12 +108,22 @@ namespace NXTN {
 			else if (m_ComponentStorages[cid] == nullptr) {
 				m_ComponentStorages[cid].reset(new ComponentStorage<C>);
 			}
-			return m_ComponentStorages[cid]->Add(eid);
+			ComponentStorage<C>* storage = static_cast<ComponentStorage<C>*>(m_ComponentStorages[cid].get());
+			if (C::UNIQUE_PER_ENTITY && storage->Has(e.id)) {
+				Log::Warning("Duplicate component of type %s on entity %d\n", typeid(C).name(), e.id);
+				return false;
+			}
+			storage->Add(e.id);
+			return true;
 		}
 
 		template <typename C, typename... Args>
 			requires (IsComponent<C>)
-		void AddComponent(EntityID eid, Args&&... args) {
+		bool AddComponent(Entity e, Args&&... args) {
+			if (!IsAlive(e)) {
+				Log::Warning("Stale entity %d, gen %d\n", e.id, e.generation);
+				return false;
+			}
 			ComponentID cid = ComponentIDOf<C>();
 
 			if (cid >= m_ComponentStorages.size()) {
@@ -118,8 +133,13 @@ namespace NXTN {
 			else if (m_ComponentStorages[cid] == nullptr) {
 				m_ComponentStorages[cid].reset(new ComponentStorage<C>);
 			}
-			static_cast<ComponentStorage<C>*>(m_ComponentStorages[cid].get())->
-				Emplace(eid, std::forward<Args>(args)...);
+			ComponentStorage<C>* storage = static_cast<ComponentStorage<C>*>(m_ComponentStorages[cid].get());
+			if (C::UNIQUE_PER_ENTITY && storage->Has(e.id)) {
+				Log::Warning("Duplicate component of type %s on entity %d\n", typeid(C).name(), e.id);
+				return false;
+			}
+			storage->Emplace(e.id, std::forward<Args>(args)...);
+			return true;
 		}
 
 		template <typename... Cs, typename F>
@@ -129,7 +149,7 @@ namespace NXTN {
 			constexpr size_t kCs = sizeof...(Cs);
 
 			std::tuple<ComponentStorage<Cs>*...> compStorages = { TryGetStorage<Cs>()... };
-			std::array<IComponentStorage*, kCs> iCompStorages = {
+			std::vector<IComponentStorage*> iCompStorages = {
 				static_cast<IComponentStorage*>(std::get<ComponentStorage<Cs>*>(compStorages))...
 			};
 
@@ -138,10 +158,10 @@ namespace NXTN {
 			size_t driverStorageIdx = 0;
 			for (size_t i = 0; i < kCs; i++) {
 				if (iCompStorages[i] == nullptr) {
-					//// Missing is expected, consider skip warnings
-					//std::string names;
-					//((names += typeid(Cs).name(), names += ' '), ...);
-					//Log::Warning("No entity has component(s) of type(s) %s\n", names.c_str());
+					// Missing is expected
+					std::string names;
+					((names += typeid(Cs).name(), names += ' '), ...);
+					Log::Warning("No entity has component(s) of type(s) %s\n", names.c_str());
 					return;
 				}
 				if (iCompStorages[i]->Size() < driverStorageSize) {
@@ -191,7 +211,7 @@ namespace NXTN {
 
 		// For entity ID
 		std::vector<EntityID> m_RecycledEntityIDs;
-		std::vector<GenerationID> m_Generations;
+		std::vector<EntityGeneration> m_Generations;
 
 		// Component storage
 		std::vector<std::unique_ptr<IComponentStorage>> m_ComponentStorages;

@@ -6,6 +6,7 @@
 #include <utility>
 
 namespace NXTN {
+	// Caution: Supports up to UINT32_MAX elements
 	template<typename T>
 	class SparseSet
 	{
@@ -18,32 +19,32 @@ namespace NXTN {
 		}
 
 		bool Has(uint32_t key) const {
-			return key < m_Sparse.size()
-				&& m_Sparse[key] < m_DenseKey.size()
-				&& m_DenseKey[m_Sparse[key]] == key;
+			return static_cast<size_t>(key) < m_Sparse.size()
+				&& m_Sparse[static_cast<size_t>(key)] < m_DenseKey.size()
+				&& m_DenseKey[m_Sparse[static_cast<size_t>(key)]] == key;
 		}
 
 		T& Get(uint32_t key) {
 			assert(Has(key) && "[Sparse Set] Item does not exist");
 
-			return m_DenseData[m_Sparse[key]];
+			return m_DenseData[m_Sparse[static_cast<size_t>(key)]];
 		}
 
 		const T& Get(uint32_t key) const {
 			assert(Has(key) && "[Sparse Set] Item does not exist");
 
-			return m_DenseData[m_Sparse[key]];
+			return m_DenseData[m_Sparse[static_cast<size_t>(key)]];
 		}
 
 		bool Add(uint32_t key) {
-
 			if (Has(key)) {
 				return false;
 			}
-			if (key >= m_Sparse.size()) {
+			if (static_cast<size_t>(key) >= m_Sparse.size()) {
+				assert(key < UINT32_MAX && "[Sparse Set] Key exceeds UINT32_MAX - 1");
 				m_Sparse.resize(static_cast<size_t>(key) + 1, SIZE_MAX);
 			}
-			m_Sparse[key] = m_DenseKey.size();
+			m_Sparse[static_cast<size_t>(key)] = m_DenseKey.size();
 			m_DenseKey.push_back(key);
 			m_DenseData.emplace_back();
 
@@ -52,14 +53,14 @@ namespace NXTN {
 
 		template <typename... Args>
 		bool Emplace(uint32_t key, Args&&... args) {
-
 			if (Has(key)) {
 				return false;
 			}
-			if (key >= m_Sparse.size()) {
+			if (static_cast<size_t>(key) >= m_Sparse.size()) {
+				assert(key < UINT32_MAX && "[Sparse Set] Key exceeds UINT32_MAX - 1");
 				m_Sparse.resize(static_cast<size_t>(key) + 1, SIZE_MAX);
 			}
-			m_Sparse[key] = m_DenseKey.size();
+			m_Sparse[static_cast<size_t>(key)] = m_DenseKey.size();
 			m_DenseKey.push_back(key);
 			m_DenseData.emplace_back(std::forward<Args>(args)...);
 
@@ -67,39 +68,40 @@ namespace NXTN {
 		}
 
 		void Update(uint32_t key, const T& data) {
-			if (key < m_Sparse.size()) {
+			if (static_cast<size_t>(key) < m_Sparse.size()) {
 				// Add
-				if (m_Sparse[key] == SIZE_MAX) {
+				if (m_Sparse[static_cast<size_t>(key)] == SIZE_MAX) {
+					m_Sparse[static_cast<size_t>(key)] = m_DenseKey.size();
 					m_DenseKey.push_back(key);
 					m_DenseData.push_back(data);
-					m_Sparse[key] = m_DenseKey.size() - 1;
 				}
 				// Update
 				else {
-					m_DenseData[m_Sparse[key]] = data;
+					m_DenseData[m_Sparse[static_cast<size_t>(key)]] = data;
 				}
 			}
 			// Add
 			else {
+				assert(key < UINT32_MAX && "[Sparse Set] Key exceeds UINT32_MAX - 1");
 				m_Sparse.resize(static_cast<size_t>(key) + 1, SIZE_MAX);
 
+				m_Sparse[static_cast<size_t>(key)] = m_DenseKey.size();
 				m_DenseKey.push_back(key);
 				m_DenseData.push_back(data);
-				m_Sparse[key] = m_DenseKey.size() - 1;
 			}
 		}
 
 		void Update(uint32_t key, T&& data) {
-			if (key < m_Sparse.size()) {
+			if (static_cast<size_t>(key) < m_Sparse.size()) {
 				// Add
-				if (m_Sparse[key] == SIZE_MAX) {
+				if (m_Sparse[static_cast<size_t>(key)] == SIZE_MAX) {
+					m_Sparse[static_cast<size_t>(key)] = m_DenseKey.size();
 					m_DenseKey.push_back(key);
 					m_DenseData.push_back(std::move(data));
-					m_Sparse[key] = m_DenseKey.size() - 1;
 				}
 				// Update
 				else {
-					m_DenseData[m_Sparse[key]] = std::move(data);
+					m_DenseData[m_Sparse[static_cast<size_t>(key)]] = std::move(data);
 				}
 			}
 			// Add
@@ -108,7 +110,7 @@ namespace NXTN {
 
 				m_DenseKey.push_back(key);
 				m_DenseData.push_back(std::move(data));
-				m_Sparse[key] = m_DenseKey.size() - 1;
+				m_Sparse[static_cast<size_t>(key)] = m_DenseKey.size() - 1;
 			}
 		}
 
@@ -118,7 +120,7 @@ namespace NXTN {
 			}
 
 			size_t denseIdxLast = m_DenseData.size() - 1;
-			size_t denseIdxToRmv = m_Sparse[key];
+			size_t denseIdxToRmv = m_Sparse[static_cast<size_t>(key)];
 
 			if (denseIdxToRmv != denseIdxLast) {
 				// The sparse for the last item in dense now maps to the one to be removed/overwritten
@@ -131,14 +133,10 @@ namespace NXTN {
 			m_DenseKey.pop_back();
 			m_DenseData.pop_back();
 
-			m_Sparse[key] = SIZE_MAX;
+			m_Sparse[static_cast<size_t>(key)] = SIZE_MAX;
 
 			return true;
 		}
-
-		//T& Get(uint32_t key) {
-
-		//}
 
 		const std::vector<uint32_t>& Keys() const {
 			return m_DenseKey;

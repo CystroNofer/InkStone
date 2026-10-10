@@ -54,9 +54,9 @@ namespace NXTN {
 		}
 
 	private:
-		// Get() has to return T*
-		// If the vector stores T then relocate when scaling
-		// T* might become invalid
+		// Get() should return T*
+		// If the vector stores T then it will relocate when scaling
+		// Causing previously returned T* to become invalid
 		std::vector<std::pair<uint32_t, std::unique_ptr<T>>> m_Map;
 	};
 }
