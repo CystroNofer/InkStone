@@ -21,13 +21,11 @@
 
 #include "ECS/Component.h"
 #include "ECS/Entity.h"
-#include "ECS/Registry.h"
 #include "ECS/Scene.h"
 
 #include "Gameplay/Component/Camera.h"
 #include "Gameplay/Component/Renderable.h"
 #include "Gameplay/Component/Transform.h"
-#include "Gameplay/System/SceneRenderer.h"
 
 #include "Input/Input.h"
 
@@ -76,8 +74,7 @@ namespace NXTN {
 		float m_CameraAngle = 0;
 		float m_CameraDistance = 10;
 
-		std::unique_ptr<Registry> m_Registry;
-		std::unique_ptr<SceneRenderer> m_SceneRenderer;
+		std::unique_ptr<Scene> m_Scene;
 
 		ImGuiID m_DockspaceID;
 		ImGuiWindowFlags m_DockSpaceFlag;

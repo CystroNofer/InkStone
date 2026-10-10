@@ -87,9 +87,9 @@ namespace NXTN {
 		);
 
 		// Scene
-		m_Registry.reset(new Registry());
-		Entity ett = m_Registry->NewEntity<Transform>("Test Entity");
-		m_Registry->AddComponent<Renderable>(
+		m_Scene.reset(new Scene());
+		Entity ett = m_Scene->NewEntity<Transform>("Test Entity");
+		m_Scene->AddComponent<Renderable>(
 			ett,
 			new Mesh(
 				VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
@@ -98,7 +98,6 @@ namespace NXTN {
 			m_MaterialHandle
 		);
 
-		m_SceneRenderer.reset(new SceneRenderer());
 	}
 
 	Application::~Application()
@@ -246,7 +245,7 @@ namespace NXTN {
 			Renderer::SetClearColor(1.0f, 0.0f, 1.0f);
 			Renderer::ClearFrameBuffer();
 
-			m_SceneRenderer->Run(m_Registry, m_SceneCameraTransform, m_SceneCamera);
+			m_Scene->Render(*m_SceneCamera, *m_SceneCameraTransform);
 
 			m_FrameBuffer->Unbind();
 		}
