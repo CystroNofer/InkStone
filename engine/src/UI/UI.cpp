@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "UI.h"
+#include "ECS/Scene.h"
 
 #include "Time.h"
 #include "Window/Window.h"
@@ -8,6 +9,15 @@
 
 namespace NXTN {
 	std::unique_ptr<UI> UI::s_UI = nullptr;
+
+	void UI::HierarchyTree(SceneHierarchyView hierarchy)
+	{
+		if (!s_UI) {
+			Log::Warning("UI uninitialized");
+			return;
+		}
+		s_UI->HierarchyTreeImpl(hierarchy);
+	}
 
 	void UI::Init(unsigned int w, unsigned int h)
 	{

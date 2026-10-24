@@ -37,18 +37,7 @@ namespace NXTN {
 		}
 
 		bool Add(uint32_t key) {
-			if (Has(key)) {
-				return false;
-			}
-			if (static_cast<size_t>(key) >= m_Sparse.size()) {
-				assert(key < UINT32_MAX && "[Sparse Set] Key exceeds UINT32_MAX - 1");
-				m_Sparse.resize(static_cast<size_t>(key) + 1, SIZE_MAX);
-			}
-			m_Sparse[static_cast<size_t>(key)] = m_DenseKey.size();
-			m_DenseKey.push_back(key);
-			m_DenseData.emplace_back();
-
-			return true;
+			return Emplace(key);
 		}
 
 		template <typename... Args>
@@ -60,9 +49,16 @@ namespace NXTN {
 				assert(key < UINT32_MAX && "[Sparse Set] Key exceeds UINT32_MAX - 1");
 				m_Sparse.resize(static_cast<size_t>(key) + 1, SIZE_MAX);
 			}
-			m_Sparse[static_cast<size_t>(key)] = m_DenseKey.size();
 			m_DenseKey.push_back(key);
-			m_DenseData.emplace_back(std::forward<Args>(args)...);
+			try {
+				m_DenseData.emplace_back(std::forward<Args>(args)...);
+			}
+			catch (...) {
+				m_DenseKey.pop_back();
+				throw;
+			}
+			// Publish only after construction, so failed entity creation can safely roll back.
+			m_Sparse[static_cast<size_t>(key)] = m_DenseKey.size() - 1;
 
 			return true;
 		}

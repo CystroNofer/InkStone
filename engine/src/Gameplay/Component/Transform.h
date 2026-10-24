@@ -9,8 +9,9 @@ namespace NXTN {
 		Transform();
 		~Transform();
 
-		mat4 GetMMatrix();
+		mat4 GetMMatrix() const;
 
+		// Local to the parent; roots are relative to world space.
 		vec3 position;
 		vec3 scale;
 		Quaternion rotation;

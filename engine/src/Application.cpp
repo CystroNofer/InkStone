@@ -233,6 +233,13 @@ namespace NXTN {
 					ImGui::Separator();
 				}
 				ImGui::End();
+
+				ImGui::SetNextWindowDockID(m_DockspaceID, ImGuiCond_FirstUseEver);
+				ImGui::Begin("Hierarchy", nullptr, m_SubWindowFlag);
+				{
+					UI::HierarchyTree(m_Scene->GetHierarchyView());
+				}
+				ImGui::End();
 			}
 			ImGui::End();
 		}

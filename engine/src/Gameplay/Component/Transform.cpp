@@ -3,11 +3,11 @@
 #include "Transform.h"
 
 namespace NXTN {
-	Transform::Transform() : scale(1.0f), rotation(0.0f, 0.0f, 0.0f, 1.0f) {}
+	Transform::Transform() : position(0.0f), scale(1.0f), rotation(0.0f, 0.0f, 0.0f, 1.0f) {}
 
 	Transform::~Transform() {}
 
-	mat4 Transform::GetMMatrix()
+	mat4 Transform::GetMMatrix() const
 	{
 		float r11 = (1.0f - 2.0f * (rotation.y * rotation.y + rotation.z * rotation.z)) * scale.x;
 		float r12 = 2.0f * (rotation.x * rotation.y - rotation.w * rotation.z) * scale.y;

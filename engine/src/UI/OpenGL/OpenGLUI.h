@@ -14,6 +14,7 @@ namespace NXTN {
 
 		virtual void NewFrameImpl() override;
 		virtual void EndFrameImpl() override;
+		virtual void HierarchyTreeImpl(SceneHierarchyView hierarchy) override;
 
 		virtual void OnEventImpl(Event*& event_ptr) override;
 	};

@@ -1,6 +1,8 @@
 #include "pch.h"
 
 #include "OpenGLUI.h"
+#include "ECS/Scene.h"
+#include <imgui.h>
 
 #include "Input/Keycode.h"
 #include "Event/ApplicationEvent.h"
@@ -65,6 +67,47 @@ namespace NXTN {
 	{
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
+
+	void OpenGLUI::HierarchyTreeImpl(SceneHierarchyView hierarchy)
+	{
+		std::vector<Entity> roots = hierarchy.GetRoots();
+		if (roots.empty()) {
+			ImGui::TextUnformatted("No entity in hierarchy");
+			return;
+		}
+
+		// Explicit traversal stack avoids recursion for deeply nested scenes.
+		struct TraversalFrame {
+			std::span<const Entity> entities;
+			size_t next = 0;
+		};
+		std::vector<TraversalFrame> pending{ { std::span<const Entity>(roots) } };
+		ImGui::PushID(hierarchy.GetIdentity());
+		while (!pending.empty()) {
+			if (pending.back().next == pending.back().entities.size()) {
+				pending.pop_back();
+				if (!pending.empty()) { ImGui::Unindent(); }
+				continue;
+			}
+			Entity entity = pending.back().entities[pending.back().next++];
+			std::span<const Entity> children = hierarchy.GetChildren(entity);
+			std::string_view name = hierarchy.GetName(entity);
+			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+			if (children.empty()) { flags |= ImGuiTreeNodeFlags_Leaf; }
+
+			// Identity is independent of labels and ancestor paths.
+			ImGui::PushID(static_cast<int>(entity.GetID()));
+			ImGui::PushID(static_cast<int>(entity.GetGeneration()));
+			bool expanded = ImGui::TreeNodeEx("entity", flags, "%.*s", static_cast<int>(name.size()), name.data());
+			ImGui::PopID();
+			ImGui::PopID();
+			if (expanded && !children.empty()) {
+				pending.push_back({ children });
+				ImGui::Indent();
+			}
+		}
+		ImGui::PopID();
 	}
 
 	void OpenGLUI::OnEventImpl(Event*& event_ptr)

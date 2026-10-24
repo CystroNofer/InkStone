@@ -17,6 +17,7 @@
 #include <limits>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <ranges>
 //#include <regex>
 #include <sstream>
@@ -28,6 +29,8 @@
 #include <array>
 #include <deque>
 #include <string>
+#include <span>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>

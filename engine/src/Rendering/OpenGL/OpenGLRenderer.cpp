@@ -39,18 +39,15 @@ namespace NXTN {
 			}
 		);
 
-		Handle<Material> lastMaterialHandle;
 		for (const RenderItem& item : renderItems)
 		{
-			Material& material = *MaterialManager::Get(item.materialHandle);
-			if (item.materialHandle != lastMaterialHandle)
-			{
-				material.Bind();
-			}
+			Material* material = MaterialManager::Get(item.materialHandle);
+			if (!item.meshRef || !material) { continue; }
+			// Material setters update cached values; Bind uploads them for this draw.
+			material->SetUniformMat4("u_ModelMatrix", item.mMatrix);
+			material->SetUniformMat4("u_VPMatrix", m_VPMatrix);
+			material->Bind();
 			item.meshRef->Bind();
-
-			material.SetUniformMat4("u_ModelMatrix", item.mMatrix);
-			material.SetUniformMat4("u_VPMatrix", m_VPMatrix);
 
 			glDrawElements(GL_TRIANGLES, item.meshRef->GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
 
