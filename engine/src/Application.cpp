@@ -251,7 +251,27 @@ namespace NXTN {
 				ImGui::SetNextWindowDockID(m_DockspaceID, ImGuiCond_FirstUseEver);
 				ImGui::Begin("Hierarchy", nullptr, m_SubWindowFlag);
 				{
-					UI::HierarchyTree(m_Scene->GetHierarchyView());
+					if (m_SelectedEntity && !m_Scene->IsAlive(*m_SelectedEntity)) { m_SelectedEntity.reset(); }
+					m_SelectedEntity = UI::HierarchyTree(m_Scene->GetHierarchyView(), m_SelectedEntity);
+				}
+				ImGui::End();
+
+				ImGui::SetNextWindowDockID(m_DockspaceID, ImGuiCond_FirstUseEver);
+				ImGui::Begin("Inspector", nullptr, m_SubWindowFlag);
+				{
+					if (!m_SelectedEntity) {
+						ImGui::TextUnformatted("Select an entity in the hierarchy");
+					}
+					else {
+						std::string_view name = m_Scene->GetHierarchyView().GetName(*m_SelectedEntity);
+						ImGui::Text("%.*s", static_cast<int>(name.size()), name.data());
+						Transform* transform = m_Scene->TryGetComponent<Transform>(*m_SelectedEntity);
+						if (!transform) { ImGui::TextUnformatted("No Transform"); }
+						else {
+							Transform draft = *transform;
+						if (UI::TransformEditor(draft)) { *transform = draft; }
+						}
+					}
 				}
 				ImGui::End();
 			}

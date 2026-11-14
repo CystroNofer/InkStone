@@ -3,6 +3,7 @@
 #include "OpenGLUI.h"
 #include "ECS/Scene.h"
 #include <imgui.h>
+#include <cmath>
 
 #include "Input/Keycode.h"
 #include "Event/ApplicationEvent.h"
@@ -69,15 +70,15 @@ namespace NXTN {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	void OpenGLUI::HierarchyTreeImpl(SceneHierarchyView hierarchy)
+	std::optional<Entity> OpenGLUI::HierarchyTreeImpl(SceneHierarchyView hierarchy, std::optional<Entity> selected)
 	{
 		std::vector<Entity> roots = hierarchy.GetRoots();
 		if (roots.empty()) {
 			ImGui::TextUnformatted("No entity in hierarchy");
-			return;
+			return selected;
 		}
 
-		// Explicit traversal stack avoids recursion for deeply nested scenes.
+		// Explicit traversal stack avoids recursion for deeply nested scenes
 		struct TraversalFrame {
 			std::span<const Entity> entities;
 			size_t next = 0;
@@ -95,11 +96,12 @@ namespace NXTN {
 			std::string_view name = hierarchy.GetName(entity);
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 			if (children.empty()) { flags |= ImGuiTreeNodeFlags_Leaf; }
+			if (selected && *selected == entity) { flags |= ImGuiTreeNodeFlags_Selected; }
 
-			// Identity is independent of labels and ancestor paths.
 			ImGui::PushID(static_cast<int>(entity.GetID()));
 			ImGui::PushID(static_cast<int>(entity.GetGeneration()));
 			bool expanded = ImGui::TreeNodeEx("entity", flags, "%.*s", static_cast<int>(name.size()), name.data());
+			if (ImGui::IsItemClicked()) { selected = entity; }
 			ImGui::PopID();
 			ImGui::PopID();
 			if (expanded && !children.empty()) {
@@ -108,6 +110,62 @@ namespace NXTN {
 			}
 		}
 		ImGui::PopID();
+		return selected;
+	}
+
+	bool OpenGLUI::TransformEditorImpl(Transform& draft)
+	{
+		static bool s_UniformScale = false;
+
+		bool changed = false;
+		float position[3] = { draft.position.x, draft.position.y, draft.position.z };
+		if (ImGui::DragFloat3("Position", position, 0.05f) &&
+			std::isfinite(position[0]) &&
+			std::isfinite(position[1]) &&
+			std::isfinite(position[2]))
+		{
+			draft.position = vec3(position[0], position[1], position[2]);
+			changed = true;
+		}
+
+		float lengthSquared =
+			draft.rotation.x * draft.rotation.x +
+			draft.rotation.y * draft.rotation.y +
+			draft.rotation.z * draft.rotation.z + 
+			draft.rotation.w * draft.rotation.w;
+		if (std::isfinite(lengthSquared) && lengthSquared > EPSILON_SQ) {
+			float inverseLength = 1.0f / std::sqrt(lengthSquared);
+			float x = draft.rotation.x * inverseLength;
+			float y = draft.rotation.y * inverseLength;
+			float z = draft.rotation.z * inverseLength;
+			float w = draft.rotation.w * inverseLength;
+			// XYZ Euler display uses R = Rz * Ry * Rx
+			vec3 degrees = vec3(
+				std::atan2(2.0f * (w * x + y * z), 1.0f - 2.0f * (x * x + y * y)),
+				std::asin(std::clamp(2.0f * (w * y - z * x), -1.0f, 1.0f)),
+				std::atan2(2.0f * (w * z + x * y), 1.0f - 2.0f * (y * y + z * z))
+			) * NXTN_RAD_2_DEG_FLOAT;
+			ImGui::Text("Rotation (Euler, read-only): %.1f, %.1f, %.1f", degrees.x, degrees.y, degrees.z);
+		}
+		else { ImGui::TextUnformatted("Rotation: invalid quaternion"); }
+
+		float scale[3] = { draft.scale.x, draft.scale.y, draft.scale.z };
+		if (ImGui::DragFloat3("Scale", scale, 0.05f) &&
+			std::isfinite(scale[0]) &&
+			std::isfinite(scale[1]) &&
+			std::isfinite(scale[2]))
+		{
+			if (s_UniformScale) {
+				if (scale[0] != draft.scale.x) { scale[1] = scale[2] = scale[0]; }
+				else if (scale[1] != draft.scale.y) { scale[0] = scale[2] = scale[1]; }
+				else if (scale[2] != draft.scale.z) { scale[0] = scale[1] = scale[2]; }
+			}
+			draft.scale = vec3(scale[0], scale[1], scale[2]);
+			changed = true;
+		}
+		ImGui::SameLine();
+		ImGui::Checkbox("Uniform Scale", &s_UniformScale);
+		return changed;
 	}
 
 	void OpenGLUI::OnEventImpl(Event*& event_ptr)

@@ -14,7 +14,8 @@ namespace NXTN {
 
 		virtual void NewFrameImpl() override;
 		virtual void EndFrameImpl() override;
-		virtual void HierarchyTreeImpl(SceneHierarchyView hierarchy) override;
+		virtual std::optional<Entity> HierarchyTreeImpl(SceneHierarchyView hierarchy, std::optional<Entity> selected) override;
+		virtual bool TransformEditorImpl(Transform& draft) override;
 
 		virtual void OnEventImpl(Event*& event_ptr) override;
 	};

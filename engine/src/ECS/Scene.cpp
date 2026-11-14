@@ -12,6 +12,7 @@
 #include "Rendering/Renderer.h"
 
 #include <algorithm>
+#include <filesystem>
 #include <limits>
 #include <stdexcept>
 
@@ -60,12 +61,11 @@ namespace NXTN {
 			ModelValidation::ValidateNodes(model.nodes, model.meshes.size());
 			ModelValidation::Require(!model.meshes.empty(), "Model has no uploaded meshes");
 			for (const std::shared_ptr<Mesh>& mesh : model.meshes) { ModelValidation::Require(mesh != nullptr, "Model contains a null mesh"); }
-			ModelValidation::Require(MaterialManager::Get(material) != nullptr, "Invalid application-supplied material handle");
+			ModelValidation::Require(MaterialManager::Get(material) != nullptr, "Invalid material handle");
 			ModelValidation::Require(!parent || TryGetComponent<Transform>(*parent), "Instance parent must be live and have Transform");
 			size_t count = model.nodes.size() + 1;
 			for (const ModelNode& node : model.nodes) {
 				if (node.meshes.size() > 1) {
-					ModelValidation::Require(node.meshes.size() <= std::numeric_limits<size_t>::max() - count, "Entity count overflow");
 					count += node.meshes.size();
 				}
 			}
@@ -73,8 +73,9 @@ namespace NXTN {
 			created.reserve(count);
 			std::vector<Entity> nodeEntities;
 			nodeEntities.reserve(model.nodes.size());
-			created.push_back(NewEntity<Transform>(model.source.empty() ? "Model Instance" : model.source));
-			ModelValidation::Require(SetParent(created.front(), parent), "Could not parent model instance");
+			const std::string filename = std::filesystem::path(model.source).filename().string();
+			created.push_back(NewEntity<Transform>(filename.empty() ? "Model Instance" : filename));
+			SetParent(created.front(), parent);
 			for (const ModelNode& node : model.nodes) {
 				Entity entity = NewEntity<Transform>(node.name.empty() ? "Unnamed Node" : node.name);
 				created.push_back(entity);
@@ -84,12 +85,12 @@ namespace NXTN {
 				transform->position = node.localTransform.position;
 				transform->rotation = node.localTransform.rotation;
 				transform->scale = node.localTransform.scale;
-				ModelValidation::Require(SetParent(entity, node.parent ? nodeEntities[*node.parent] : created.front()), "Could not parent imported node");
+				SetParent(entity, node.parent ? nodeEntities[*node.parent] : created.front());
 				if (node.meshes.size() == 1) {
 					ModelValidation::Require(AddComponent<Renderable>(entity, model.meshes[node.meshes.front()], material), "Could not create Renderable");
 				}
 				else {
-					for (size_t i = 0; i < node.meshes.size(); ++i) {
+					for (size_t i = 0; i < node.meshes.size(); i++) {
 						Entity child = NewEntity<Transform>(node.name + " Mesh " + std::to_string(i));
 						created.push_back(child);
 						ModelValidation::Require(SetParent(child, entity), "Could not parent mesh child");

@@ -10,13 +10,22 @@
 namespace NXTN {
 	std::unique_ptr<UI> UI::s_UI = nullptr;
 
-	void UI::HierarchyTree(SceneHierarchyView hierarchy)
+	std::optional<Entity> UI::HierarchyTree(SceneHierarchyView hierarchy, std::optional<Entity> selected)
 	{
 		if (!s_UI) {
 			Log::Warning("UI uninitialized");
-			return;
+			return selected;
 		}
-		s_UI->HierarchyTreeImpl(hierarchy);
+		return s_UI->HierarchyTreeImpl(hierarchy, selected);
+	}
+
+	bool UI::TransformEditor(Transform& draft)
+	{
+		if (!s_UI) {
+			Log::Warning("UI uninitialized");
+			return false;
+		}
+		return s_UI->TransformEditorImpl(draft);
 	}
 
 	void UI::Init(unsigned int w, unsigned int h)

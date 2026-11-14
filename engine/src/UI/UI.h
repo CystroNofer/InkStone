@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Event/Event.h"
+#include "ECS/Entity.h"
+#include "Gameplay/Component/Transform.h"
+#include <optional>
 
 namespace NXTN {
 	class SceneHierarchyView;
@@ -14,8 +17,10 @@ namespace NXTN {
 		// Public static interface/wrapper
 		static void NewFrame();
 		static void EndFrame();
-		// Draws into the current UI container; no selection or scene mutation.
-		static void HierarchyTree(SceneHierarchyView hierarchy);
+		// Returns the selected entity; scene mutation remains with the caller.
+		static std::optional<Entity> HierarchyTree(SceneHierarchyView hierarchy, std::optional<Entity> selected);
+		// Edits a caller-owned copy and reports whether any value changed.
+		static bool TransformEditor(Transform& draft);
 		
 		static void OnEvent(Event*& event_ptr);
 
@@ -25,7 +30,8 @@ namespace NXTN {
 		// Protected virtual implementation
 		virtual void NewFrameImpl() = 0;
 		virtual void EndFrameImpl() = 0;
-		virtual void HierarchyTreeImpl(SceneHierarchyView hierarchy) = 0;
+		virtual std::optional<Entity> HierarchyTreeImpl(SceneHierarchyView hierarchy, std::optional<Entity> selected) = 0;
+		virtual bool TransformEditorImpl(Transform& draft) = 0;
 
 		virtual void OnEventImpl(Event*& event_ptr) = 0;
 

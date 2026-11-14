@@ -47,6 +47,7 @@
 #include "Window/Window.h"
 
 #include <imgui.h>
+#include <optional>
 
 namespace NXTN {
 	class Application
@@ -77,6 +78,7 @@ namespace NXTN {
 		float m_CameraDistance = 10;
 
 		std::unique_ptr<Scene> m_Scene;
+		std::optional<Entity> m_SelectedEntity;
 
 		ImGuiID m_DockspaceID;
 		ImGuiWindowFlags m_DockSpaceFlag;

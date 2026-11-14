@@ -150,20 +150,20 @@ namespace NXTN {
 		// Handles are scene-local. Cross-scene identity checks are not implemented
 		// Keep-local parenting: local TRS stays unchanged
 		// Parenting to std::nullopt makes a root
-		// Requires a Transform on the child and on any supplied parent.
+		// Requires a Transform on the child and on any supplied parent
 		bool SetParent(Entity child, std::optional<Entity> parent);
 
 		std::optional<Entity> GetParent(Entity entity) const;
 		// Borrowed views
 		// Avoid retaining or mutating the returned span
 		std::span<const Entity> GetChildren(Entity entity) const;
-		// Snapshot of live parentless entities with Transform, ordered by ID; handles can become stale.
+		// Snapshot of live parentless entities with Transform, ordered by ID; handles can become stale
 		std::vector<Entity> GetRoots() const;
 		SceneHierarchyView GetHierarchyView() const &;
 		SceneHierarchyView GetHierarchyView() const && = delete;
 
 		// Removes the whole subtree
-		// Returns false for stale handles or during Each().
+		// Returns false for stale handles or during Each()
 		bool DestroyEntity(Entity entity);
 
 		// World matrices are snapshots
