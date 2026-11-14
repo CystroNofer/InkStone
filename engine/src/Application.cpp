@@ -52,52 +52,66 @@ namespace NXTN {
 
 		m_FrameBuffer.reset(FrameBuffer::Create(winWidth, winHeight));
 
-		// Temporary draw data
-		// Vertex buffer
-		// 1 3
-		// 0 2
-		float vertices[20] = {
-			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f
-		};
+		//// Temporary draw data
+		//// Vertex buffer
+		//// 1 3
+		//// 0 2
+		//float vertices[20] = {
+		//	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+		//	-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+		//	 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+		//	 0.5f,  0.5f, 0.0f, 1.0f, 1.0f
+		//};
 
-		// Vertex array layout
-		VertexArrayLayout layout({
-			{VertexDataType::Float, 3, "Vertex Position"},
-			{VertexDataType::Float, 2, "Texture Coordinate"}
-			});
+		//// Vertex array layout
+		//VertexArrayLayout layout({
+		//	{VertexDataType::Float, 3, "Vertex Position"},
+		//	{VertexDataType::Float, 2, "Texture Coordinate"}
+		//	});
 
-		// Index buffer
-		unsigned int indices[6] = {
-			0, 1, 3,
-			0, 3, 2
-		};
+		//// Index buffer
+		//unsigned int indices[6] = {
+		//	0, 1, 3,
+		//	0, 3, 2
+		//};
 
 		// Shader, Material, and Texture
 		m_MaterialHandle = MaterialManager::Create(ShaderManager::Load(ShaderProgramDescriptor{
 			{
-				{ ShaderStage::Vertex, "../Asset/Shader/Texture.vert" },
-				{ ShaderStage::Fragment, "../Asset/Shader/Texture.frag" }
+				{ ShaderStage::Vertex, "../asset/Shader/Texture.vert" },
+				{ ShaderStage::Fragment, "../asset/Shader/Texture.frag" }
 			}
 		}));
 		MaterialManager::Get(m_MaterialHandle)->SetUniformTex2D(
-			"u_MainTex", TextureManager::Create("../Asset/Texture/uv_map_rg_bottom_left_1024.png")
+			"u_MainTex", TextureManager::Create("../asset/Texture/uv_map_rg_bottom_left_1024.png")
 		);
 
 		// Scene
 		m_Scene.reset(new Scene());
-		Entity ett = m_Scene->NewEntity<Transform>("Test Entity");
-		m_Scene->AddComponent<Renderable>(
-			ett,
-			new Mesh(
-				VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
-				IndexBuffer::Create(indices, 6)
-			),
-			m_MaterialHandle
-		);
-
+		//Entity ett = m_Scene->NewEntity<Transform>("Test Entity");
+		//m_Scene->AddComponent<Renderable>(
+		//	ett,
+		//	new Mesh(
+		//		VertexArray::Create(VertexBuffer::Create(vertices, 20), layout),
+		//		IndexBuffer::Create(indices, 6)
+		//	),
+		//	m_MaterialHandle
+		//);
+		std::expected<ModelData, ModelError> importResult = ModelLoader::Import("../asset/Model/ShaderBall-master/shaderBallNoCrease/shaderBall.obj");
+		if (importResult) {
+			std::expected<Model, ModelError> uploadResult = ModelLoader::Upload(*importResult);
+			if (uploadResult) {
+				m_Scene->InstantiateModel(*uploadResult, m_MaterialHandle);
+			}
+			else
+			{
+				Log::Warning("%s", uploadResult.error().message.c_str());
+			}
+		}
+		else
+		{
+			Log::Warning("%s", importResult.error().message.c_str());
+		}
 	}
 
 	Application::~Application()

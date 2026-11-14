@@ -1,13 +1,18 @@
 #include "pch.h"
 
 #include "OpenGLVertexArray.h"
+#include <stdexcept>
 
 namespace NXTN {
 
 	OpenGLVertexArray::OpenGLVertexArray(OpenGLVertexBuffer* vertexBuffer, const VertexArrayLayout& layout)
-		: m_VertexBuffer(vertexBuffer), m_Layout(layout)
+		: OpenGLVertexArray(std::shared_ptr<OpenGLVertexBuffer>(vertexBuffer), layout) {}
+
+	OpenGLVertexArray::OpenGLVertexArray(std::shared_ptr<OpenGLVertexBuffer> vertexBuffer, const VertexArrayLayout& layout)
+		: m_VertexBuffer(std::move(vertexBuffer)), m_Layout(layout)
 	{
 		glCreateVertexArrays(1, &m_ObjectID);
+		if (!m_ObjectID) { throw std::runtime_error("OpenGL vertex-array creation failed."); }
 		glBindVertexArray(m_ObjectID);
 
 		m_VertexBuffer->Bind();
@@ -35,10 +40,7 @@ namespace NXTN {
 	}
 
 	OpenGLVertexArray::OpenGLVertexArray(OpenGLVertexBuffer* vertexBuffer, const std::initializer_list<VertexAtrribute>& il)
-		: m_VertexBuffer(vertexBuffer), m_Layout(il)
-	{
-		OpenGLVertexArray(vertexBuffer, m_Layout);
-	}
+		: OpenGLVertexArray(vertexBuffer, VertexArrayLayout(il)) {}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{

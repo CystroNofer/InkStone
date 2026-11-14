@@ -11,6 +11,8 @@
 #include "Log.h"
 
 #include "Asset/MaterialManager.h"
+#include "Asset/Model.h"
+#include "Asset/ModelLoader.h"
 #include "Asset/ShaderManager.h"
 #include "Asset/TextureManager.h"
 

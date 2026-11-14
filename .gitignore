@@ -1,8 +1,8 @@
 .vs/
+asset/
 bin/
 bin-obj/
 dependencies/
-external/GLAD/bin
-external/GLAD/bin-obj
 external/GLAD/GLAD.vc*
+external/Assimp/assimp-vc143-mt.pdb
 engine/engine.vc*

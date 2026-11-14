@@ -21,6 +21,7 @@ namespace NXTN {
 	{
 	public:
 		OpenGLVertexArray(OpenGLVertexBuffer* vertexBuffer, const VertexArrayLayout& layout);
+		OpenGLVertexArray(std::shared_ptr<OpenGLVertexBuffer> vertexBuffer, const VertexArrayLayout& layout);
 		OpenGLVertexArray(OpenGLVertexBuffer* vertexBuffer, const std::initializer_list<VertexAtrribute>& il);
 		virtual ~OpenGLVertexArray();
 

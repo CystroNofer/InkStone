@@ -45,6 +45,12 @@ namespace NXTN {
 		return new OpenGLVertexArray(openGLVertexBuffer, layout);
 	}
 
+	VertexArray* OpenGLGraphicsDevice::CreateVertexArray(std::shared_ptr<VertexBuffer> vertexBuffer, const VertexArrayLayout& layout)
+	{
+		std::shared_ptr<OpenGLVertexBuffer> buffer = std::dynamic_pointer_cast<OpenGLVertexBuffer>(vertexBuffer);
+		return buffer ? new OpenGLVertexArray(std::move(buffer), layout) : nullptr;
+	}
+
 	Texture2D* OpenGLGraphicsDevice::CreateTexture2D(const std::string& filepath)
 	{
 		OpenGLTexture2D* texture = new OpenGLTexture2D(filepath);

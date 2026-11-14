@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core.h"
+#include <memory>
 
 namespace NXTN {
 	class FrameBuffer;
@@ -28,6 +29,8 @@ namespace NXTN {
 		virtual VertexBuffer* CreateVertexBuffer(const float* vertices, unsigned int count) = 0;
 		virtual IndexBuffer* CreateIndexBuffer(const unsigned int* indices, unsigned int count) = 0;
 		virtual VertexArray* CreateVertexArray(VertexBuffer* vertexBuffer, const VertexArrayLayout& layout) = 0;
+		// Shared-owner overload for exception-safe uploads and buffer reuse.
+		virtual VertexArray* CreateVertexArray(std::shared_ptr<VertexBuffer> vertexBuffer, const VertexArrayLayout& layout) = 0;
 		virtual Texture2D* CreateTexture2D(const std::string& filepath) = 0;
 		virtual FrameBuffer* CreateFrameBuffer(unsigned int width, unsigned int height) = 0;
 		virtual Shader* CreateShader(const ShaderProgramDescriptor& description) = 0;

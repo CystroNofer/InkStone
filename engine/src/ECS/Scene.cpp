@@ -3,6 +3,9 @@
 #include "Scene.h"
 #include "Log.h"
 
+#include "Asset/MaterialManager.h"
+#include "Asset/ModelValidation.h"
+
 #include "Gameplay/Component/Camera.h"
 #include "Gameplay/Component/Renderable.h"
 #include "Gameplay/Component/Transform.h"
@@ -47,6 +50,62 @@ namespace NXTN {
 
 	Scene::~Scene() {
 
+	}
+
+	std::expected<Entity, ModelError> Scene::InstantiateModel(
+		const Model& model, Handle<Material> material, std::optional<Entity> parent)
+	{
+		std::vector<Entity> created;
+		try {
+			ModelValidation::ValidateNodes(model.nodes, model.meshes.size());
+			ModelValidation::Require(!model.meshes.empty(), "Model has no uploaded meshes");
+			for (const std::shared_ptr<Mesh>& mesh : model.meshes) { ModelValidation::Require(mesh != nullptr, "Model contains a null mesh"); }
+			ModelValidation::Require(MaterialManager::Get(material) != nullptr, "Invalid application-supplied material handle");
+			ModelValidation::Require(!parent || TryGetComponent<Transform>(*parent), "Instance parent must be live and have Transform");
+			size_t count = model.nodes.size() + 1;
+			for (const ModelNode& node : model.nodes) {
+				if (node.meshes.size() > 1) {
+					ModelValidation::Require(node.meshes.size() <= std::numeric_limits<size_t>::max() - count, "Entity count overflow");
+					count += node.meshes.size();
+				}
+			}
+			// Reserve before creating entities, so bookkeeping cannot fail after an entity is returned.
+			created.reserve(count);
+			std::vector<Entity> nodeEntities;
+			nodeEntities.reserve(model.nodes.size());
+			created.push_back(NewEntity<Transform>(model.source.empty() ? "Model Instance" : model.source));
+			ModelValidation::Require(SetParent(created.front(), parent), "Could not parent model instance");
+			for (const ModelNode& node : model.nodes) {
+				Entity entity = NewEntity<Transform>(node.name.empty() ? "Unnamed Node" : node.name);
+				created.push_back(entity);
+				nodeEntities.push_back(entity);
+				Transform* transform = TryGetComponent<Transform>(entity);
+				ModelValidation::Require(transform != nullptr, "Could not create node Transform");
+				transform->position = node.localTransform.position;
+				transform->rotation = node.localTransform.rotation;
+				transform->scale = node.localTransform.scale;
+				ModelValidation::Require(SetParent(entity, node.parent ? nodeEntities[*node.parent] : created.front()), "Could not parent imported node");
+				if (node.meshes.size() == 1) {
+					ModelValidation::Require(AddComponent<Renderable>(entity, model.meshes[node.meshes.front()], material), "Could not create Renderable");
+				}
+				else {
+					for (size_t i = 0; i < node.meshes.size(); ++i) {
+						Entity child = NewEntity<Transform>(node.name + " Mesh " + std::to_string(i));
+						created.push_back(child);
+						ModelValidation::Require(SetParent(child, entity), "Could not parent mesh child");
+						ModelValidation::Require(AddComponent<Renderable>(child, model.meshes[node.meshes[i]], material), "Could not create mesh Renderable");
+					}
+				}
+			}
+			return created.front();
+		}
+		catch (const std::exception& error) {
+			// Child-first rollback also covers a freshly created node not yet attached to its parent.
+			for (std::vector<Entity>::reverse_iterator it = created.rbegin(); it != created.rend(); ++it) {
+				DestroyEntity(*it);
+			}
+			return std::unexpected(ModelError{ model.source, "instantiate", error.what() });
+		}
 	}
 
 	void Scene::Render(Camera& camera, const Transform& cameraTransform)

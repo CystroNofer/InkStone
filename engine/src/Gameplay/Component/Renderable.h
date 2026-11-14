@@ -12,6 +12,7 @@ namespace NXTN {
 		Renderable();
 		// TODO: Update to handles
 		Renderable(Mesh* m, Handle<Material> s);
+		Renderable(std::shared_ptr<Mesh> mesh, Handle<Material> material);
 
 		Handle<Material> materialHandle;
 

@@ -40,6 +40,13 @@ project "engine"
 		"external/imgui/",
 		"external/stb_image/"
 	}
+
+	includedirs{
+		"external/Assimp/include",
+		"%{cfg.objdir}/assimp/include"
+	}
+	libdirs { "%{cfg.objdir}/assimp" }
+	links { "assimp-c-api" }
 	
 	syslibdirs{
 		"external/GLFW/lib"
@@ -54,6 +61,13 @@ project "engine"
 
 	filter "system:windows"
 		systemversion "latest"
+		defines { "ASSIMP_DLL" }
+		prebuildcommands {
+			'powershell -NoProfile -ExecutionPolicy Bypass -File "' .. path.getabsolute("external/Assimp/Prepare.ps1") .. '" -MsvcBin "$(VCToolsInstallDir)bin\\Hostx64\\x64" -OutputDirectory "%{cfg.objdir}/assimp"'
+		}
+		postbuildcommands {
+			'{COPYFILE} "' .. path.getabsolute("external/Assimp/assimp-vc143-mt.dll") .. '" "%{cfg.targetdir}"'
+		}
 
 		defines{
 			"NXTN_PLATFORM_WINDOWS",

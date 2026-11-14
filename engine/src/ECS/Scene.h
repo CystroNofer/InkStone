@@ -1,11 +1,14 @@
 #pragma once
 
+#include <expected>
 #include <optional>
 #include <span>
 #include <string_view>
 #include <tuple>
 #include <vector>
 
+#include "Asset/Model.h"
+#include "Container/HandleMap.h"
 #include "Container/SparseSet.h"
 #include "Entity.h"
 #include "Component.h"
@@ -17,6 +20,7 @@
 
 namespace NXTN {
 	class Camera;
+	class Material;
 	class Scene;
 
 	// Borrowed read-only access. The scene must outlive the view.
@@ -111,6 +115,13 @@ namespace NXTN {
 		Scene& operator=(const Scene&) = delete;
 
 		void Render(Camera& camera, const Transform& cameraTransform);
+
+		// Creates an instance root, preserves model nodes, and shares uploaded meshes.
+		// Do not call inside Each(); this does not load files or allocate GPU geometry.
+		std::expected<Entity, ModelError> InstantiateModel(
+			const Model& model, Handle<Material> material,
+			std::optional<Entity> parent = std::nullopt
+		);
 
 		// Every entity starts parentless with NameTag; Transform is opt-in.
 		// Use NewEntity<Transform>() or AddComponent<Transform>() for spatial entities.
