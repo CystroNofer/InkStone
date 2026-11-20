@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Event/Event.h"
 #include "ECS/Entity.h"
 #include "Gameplay/Component/Transform.h"
 #include <optional>
@@ -13,6 +12,7 @@ namespace NXTN {
 		virtual ~UI() {}
 
 		static void Init(unsigned int w, unsigned int h);
+		static void Shutdown();
 		
 		// Public static interface/wrapper
 		static void NewFrame();
@@ -22,7 +22,6 @@ namespace NXTN {
 		// Edits a caller-owned copy and reports whether any value changed.
 		static bool TransformEditor(Transform& draft);
 		
-		static void OnEvent(Event*& event_ptr);
 
 	protected:
 		UI() {}
@@ -33,7 +32,6 @@ namespace NXTN {
 		virtual std::optional<Entity> HierarchyTreeImpl(SceneHierarchyView hierarchy, std::optional<Entity> selected) = 0;
 		virtual bool TransformEditorImpl(Transform& draft) = 0;
 
-		virtual void OnEventImpl(Event*& event_ptr) = 0;
 
 	private:
 		static std::unique_ptr<UI> s_UI;

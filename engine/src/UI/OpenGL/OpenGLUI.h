@@ -10,13 +10,12 @@ namespace NXTN {
 	{
 	public:
 		OpenGLUI(unsigned int w, unsigned int h);
-		~OpenGLUI() {}
+		~OpenGLUI() override;
 
 		virtual void NewFrameImpl() override;
 		virtual void EndFrameImpl() override;
 		virtual std::optional<Entity> HierarchyTreeImpl(SceneHierarchyView hierarchy, std::optional<Entity> selected) override;
 		virtual bool TransformEditorImpl(Transform& draft) override;
 
-		virtual void OnEventImpl(Event*& event_ptr) override;
 	};
 }

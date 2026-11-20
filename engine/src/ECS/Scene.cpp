@@ -128,33 +128,14 @@ namespace NXTN {
 
 	mat4 Scene::GetVMatrix(const Transform& cameraTransform)
 	{
-		// Look-at origin placeholder V matrix.
-		vec3 x, y, z;
-		if (dot(cameraTransform.position, cameraTransform.position) < EPSILON_SQ)
-		{
-			x = vec3(1.0f, 0.0f, 0.0f);
-			y = vec3(0.0f, 1.0f, 0.0f);
-			z = vec3(0.0f, 0.0f, 1.0f);
-		}
-		else
-		{
-			z = normalize(vec3(-cameraTransform.position.x, -cameraTransform.position.y, -cameraTransform.position.z));
-			if (z.x * z.x + z.z * z.z < EPSILON_SQ)
-			{
-				x = vec3(1.0f, 0.0f, 0.0f);
-				y = vec3(0.0f, 0.0f, -z.y);
-			}
-			else
-			{
-				x = normalize(vec3(z.z, 0.0f, -z.x));
-				y = normalize(cross(z, x));
-			}
-		}
+		const vec3 right = cameraTransform.Right();
+		const vec3 up = cameraTransform.Up();
+		const vec3 forward = cameraTransform.Forward();
 
 		return mat4(
-			x.x, x.y, x.z, -dot(x, cameraTransform.position),
-			y.x, y.y, y.z, -dot(y, cameraTransform.position),
-			z.x, z.y, z.z, -dot(z, cameraTransform.position),
+			right.x, right.y, right.z, -dot(right, cameraTransform.position),
+			up.x, up.y, up.z, -dot(up, cameraTransform.position),
+			forward.x, forward.y, forward.z, -dot(forward, cameraTransform.position),
 			0.0f, 0.0f, 0.0f, 1.0f
 		);
 	}

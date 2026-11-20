@@ -13,6 +13,8 @@ namespace NXTN {
 		Quaternion(float angle, const vec3& axis);
 		~Quaternion() {}
 
+		static inline Quaternion Identity() { return Quaternion(); }
+
 		Quaternion Conjugate();
 		float Length();
 
@@ -20,6 +22,8 @@ namespace NXTN {
 		vec3 ApplyRotation(const vec3& vector) const;
 
 		mat4 ToRotationMatrix();
+
+		static mat4 ToRotationMatrix(const Quaternion& q);
 		static Quaternion FromRotationMatrix(mat4 r);
 
 		std::string ToString();
@@ -28,6 +32,8 @@ namespace NXTN {
 	Quaternion normalize(const Quaternion& q);
 
 	Quaternion RotationFromTo(const vec3& from, const vec3& to);
+
+	Quaternion Rotate(const Quaternion& q, float angle, const vec3& axis, FrameOfReference frame=FrameOfReference::Local);
 
 	Quaternion operator*(const Quaternion& qa, const Quaternion& qb);
 	void operator*=(Quaternion& qa, const Quaternion& qb);

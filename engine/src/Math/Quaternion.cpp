@@ -78,6 +78,25 @@ namespace NXTN {
 		);
 	}
 
+	mat4 Quaternion::ToRotationMatrix(const Quaternion& q)
+	{
+		float r11 = 1.0f - 2.0f * (q.y * q.y + q.z * q.z);
+		float r12 = 2.0f * (q.x * q.y - q.w * q.z);
+		float r13 = 2.0f * (q.x * q.z + q.w * q.y);
+		float r21 = 2.0f * (q.x * q.y + q.w * q.z);
+		float r22 = 1.0f - 2.0f * (q.x * q.x + q.z * q.z);
+		float r23 = 2.0f * (q.y * q.z - q.w * q.x);
+		float r31 = 2.0f * (q.x * q.z - q.w * q.y);
+		float r32 = 2.0f * (q.y * q.z + q.w * q.x);
+		float r33 = 1.0f - 2.0f * (q.x * q.x + q.y * q.y);
+		return mat4(
+			r11, r12, r13, 0.0f,
+			r21, r22, r23, 0.0f,
+			r31, r32, r33, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+		);
+	}
+
 	Quaternion Quaternion::FromRotationMatrix(mat4 r)
 	{
 		// The [] operator is not trivial
@@ -93,7 +112,7 @@ namespace NXTN {
 
 		float trace = r00 + r11 + r22;
 
-		if (trace > EPSILON) {
+		if (trace > NXTN_EPSILON) {
 			float s = 2.0f * std::sqrt(trace + 1);
 			return Quaternion((r21 - r12) / s, (r02 - r20) / s, (r10 - r01) / s, 0.25f * s);
 		}
@@ -113,10 +132,18 @@ namespace NXTN {
 		}
 	}
 
+	std::string Quaternion::ToString()
+	{
+		std::stringstream ss;
+		ss << "(" << w << ", <" << x << "i, " << y << "j, " << z << "k>)";
+		const std::string s = ss.str();
+		return s;
+	}
+
 	Quaternion normalize(const Quaternion& q) {
 		float l = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
 
-		if (l < EPSILON_SQ) {
+		if (l < NXTN_EPSILON_SQ) {
 			return Quaternion();
 		}
 
@@ -135,15 +162,15 @@ namespace NXTN {
 		float d = dot(from, to);
 
 		// Same direction
-		if (d > 1.0f - EPSILON_SQ)
+		if (d > 1.0f - NXTN_EPSILON_SQ)
 		{
 			return { 0.0f, 0.0f, 0.0f, 1.0f };
 		}
 		// Opposite direction: no unique shortest axis
-		if (d < EPSILON_SQ - 1.0f)
+		if (d < NXTN_EPSILON_SQ - 1.0f)
 		{
 			vec3 axis = cross(vec3{ 1.0f, 0.0f, 0.0f }, from);
-			if (length(axis) < EPSILON)
+			if (length(axis) < NXTN_EPSILON)
 			{
 				axis = cross(vec3{ 0.0f, 1.0f, 0.0f }, from);
 			}
@@ -163,6 +190,19 @@ namespace NXTN {
 			axis.z,
 			1.0f + d
 		));
+	}
+
+	Quaternion Rotate(const Quaternion& q, float angle, const vec3& axis, FrameOfReference frame)
+	{
+		switch (frame)
+		{
+		case NXTN::FrameOfReference::Local:
+			return q * Quaternion(angle, axis);
+			break;
+		case NXTN::FrameOfReference::World:
+			return Quaternion(angle, axis) * q;
+			break;
+		}
 	}
 
 	Quaternion operator*(const Quaternion& qa, const Quaternion& qb)
@@ -190,13 +230,5 @@ namespace NXTN {
 		qa.x = x;
 		qa.y = y;
 		qa.z = z;
-	}
-
-	std::string Quaternion::ToString()
-	{
-		std::stringstream ss;
-		ss << "(" << w << ", <" << x << "i, " << y << "j, " << z << "k>)";
-		const std::string s = ss.str();
-		return s;
 	}
 }

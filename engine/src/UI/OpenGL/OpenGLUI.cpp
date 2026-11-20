@@ -3,12 +3,9 @@
 #include "OpenGLUI.h"
 #include "ECS/Scene.h"
 #include <imgui.h>
+#include <GLFW/glfw3.h>
 #include <cmath>
-
-#include "Input/Keycode.h"
-#include "Event/ApplicationEvent.h"
-#include "Event/KeyEvent.h"
-#include "Event/MouseEvent.h"
+#include <stdexcept>
 
 namespace NXTN {
 	OpenGLUI::OpenGLUI(unsigned int w, unsigned int h)
@@ -23,44 +20,30 @@ namespace NXTN {
 
 		io.DisplaySize = ImVec2(w, h);
 
-		if (io.BackendRendererUserData == nullptr)
-		{
-			ImGui_ImplOpenGL3_Init("#version 450 core");
+		GLFWwindow* window = glfwGetCurrentContext();
+		if (window == nullptr || !ImGui_ImplGlfw_InitForOpenGL(window, true)) {
+			ImGui::DestroyContext();
+			throw std::runtime_error("Could not initialize ImGui GLFW input");
+		}
+		if (!ImGui_ImplOpenGL3_Init("#version 450 core")) {
+			ImGui_ImplGlfw_Shutdown();
+			ImGui::DestroyContext();
+			throw std::runtime_error("Could not initialize ImGui OpenGL renderer");
 		}
 
-		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;  // Enable cursor functionalities defined by backend
-		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;  // Allow manually setting cursor position
+	}
 
-		// Per ImGui documentation, the docking branch of ImGui seems to not accept custom KeyMap
-		//io.KeyMap[ImGuiMouseButton_Left] = NXTN_MOUSE_BUTTON_LEFT;
-		//io.KeyMap[ImGuiMouseButton_Right] = NXTN_MOUSE_BUTTON_RIGHT;
-		//io.KeyMap[ImGuiMouseButton_Middle] = NXTN_MOUSE_BUTTON_MIDDLE;
-		//io.KeyMap[ImGuiKey_Tab] = NXTN_KEY_TAB;
-		//io.KeyMap[ImGuiKey_LeftArrow] = NXTN_KEY_LEFT;
-		//io.KeyMap[ImGuiKey_RightArrow] = NXTN_KEY_RIGHT;
-		//io.KeyMap[ImGuiKey_UpArrow] = NXTN_KEY_UP;
-		//io.KeyMap[ImGuiKey_DownArrow] = NXTN_KEY_DOWN;
-		//io.KeyMap[ImGuiKey_PageUp] = NXTN_KEY_PAGE_UP;
-		//io.KeyMap[ImGuiKey_PageDown] = NXTN_KEY_PAGE_DOWN;
-		//io.KeyMap[ImGuiKey_Home] = NXTN_KEY_HOME;
-		//io.KeyMap[ImGuiKey_End] = NXTN_KEY_END;
-		//io.KeyMap[ImGuiKey_Insert] = NXTN_KEY_INSERT;
-		//io.KeyMap[ImGuiKey_Delete] = NXTN_KEY_DELETE;
-		//io.KeyMap[ImGuiKey_Backspace] = NXTN_KEY_BACKSPACE;
-		//io.KeyMap[ImGuiKey_Space] = NXTN_KEY_SPACE;
-		//io.KeyMap[ImGuiKey_Enter] = NXTN_KEY_ENTER;
-		//io.KeyMap[ImGuiKey_Escape] = NXTN_KEY_ESCAPE;
-		//io.KeyMap[ImGuiKey_A] = NXTN_KEY_A;  // Map for Ctrl+A
-		//io.KeyMap[ImGuiKey_C] = NXTN_KEY_C;  // Map for Ctrl+C
-		//io.KeyMap[ImGuiKey_V] = NXTN_KEY_V;  // Map for Ctrl+V
-		//io.KeyMap[ImGuiKey_X] = NXTN_KEY_X;  // Map for Ctrl+X
-		//io.KeyMap[ImGuiKey_Y] = NXTN_KEY_Y;  // Map for Ctrl+Y
-		//io.KeyMap[ImGuiKey_Z] = NXTN_KEY_Z;  // Map for Ctrl+Z
+	OpenGLUI::~OpenGLUI()
+	{
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
 	}
 
 	void OpenGLUI::NewFrameImpl()
 	{
 		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 	}
 
@@ -119,7 +102,9 @@ namespace NXTN {
 
 		bool changed = false;
 		float position[3] = { draft.position.x, draft.position.y, draft.position.z };
-		if (ImGui::DragFloat3("Position", position, 0.05f) &&
+		ImGui::TextUnformatted("Position");
+		ImGui::SameLine();
+		if (ImGui::DragFloat3("##Position", position, 0.05f) &&
 			std::isfinite(position[0]) &&
 			std::isfinite(position[1]) &&
 			std::isfinite(position[2]))
@@ -133,7 +118,7 @@ namespace NXTN {
 			draft.rotation.y * draft.rotation.y +
 			draft.rotation.z * draft.rotation.z + 
 			draft.rotation.w * draft.rotation.w;
-		if (std::isfinite(lengthSquared) && lengthSquared > EPSILON_SQ) {
+		if (std::isfinite(lengthSquared) && lengthSquared > NXTN_EPSILON_SQ) {
 			float inverseLength = 1.0f / std::sqrt(lengthSquared);
 			float x = draft.rotation.x * inverseLength;
 			float y = draft.rotation.y * inverseLength;
@@ -150,7 +135,9 @@ namespace NXTN {
 		else { ImGui::TextUnformatted("Rotation: invalid quaternion"); }
 
 		float scale[3] = { draft.scale.x, draft.scale.y, draft.scale.z };
-		if (ImGui::DragFloat3("Scale", scale, 0.05f) &&
+		ImGui::TextUnformatted("Scale");
+		ImGui::SameLine();
+		if (ImGui::DragFloat3("##Scale", scale, 0.05f) &&
 			std::isfinite(scale[0]) &&
 			std::isfinite(scale[1]) &&
 			std::isfinite(scale[2]))
@@ -168,49 +155,4 @@ namespace NXTN {
 		return changed;
 	}
 
-	void OpenGLUI::OnEventImpl(Event*& event_ptr)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-
-		switch (event_ptr->GetEventType())
-		{
-		case EventType::WindowResized:
-		{
-			WindowResizeEvent e = *((WindowResizeEvent*)event_ptr);
-			io.DisplaySize = ImVec2(e.GetNewWidth(), e.GetNewHeight());
-			break;
-		}
-		case EventType::KeyPressed:
-			break;
-		case EventType::KeyReleased:
-			break;
-		case EventType::MouseButtonPressed:
-		{
-			int mouseBtnCode = (int)(((MouseButtonPressEvent*)event_ptr)->GetButton());
-			io.MouseDown[mouseBtnCode] = true;
-			break;
-		}
-		case EventType::MouseButtonReleased:
-		{
-			int mouseBtnCode = (int)(((MouseButtonPressEvent*)event_ptr)->GetButton());
-			io.MouseDown[mouseBtnCode] = false;
-			break;
-		}
-		case EventType::MouseMove:
-		{
-			MouseMoveEvent e = *(MouseMoveEvent*)event_ptr;
-			io.MousePos = ImVec2(e.GetX(), e.GetY());
-			break;
-		}
-		case EventType::MouseScroll:
-		{
-			MouseScrollEvent e = *(MouseScrollEvent*)event_ptr;
-			io.MouseWheelH += e.GetX();
-			io.MouseWheel += e.GetY();
-			break;
-		}
-		}
-
-		return;
-	}
 }

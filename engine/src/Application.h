@@ -74,8 +74,12 @@ namespace NXTN {
 		Handle<Texture2D> m_Texture;
 		Handle<Material> m_MaterialHandle;
 
-		float m_CameraAngle = 0;
-		float m_CameraDistance = 10;
+		vec3 m_CameraTarget = vec3(0.0f);
+		float m_CameraYaw = 0.0f;
+		float m_CameraPitch = 0.0f;
+		float m_CameraDistance = 10.0f;
+		bool m_OrbitActive = false;
+		bool m_PanActive = false;
 
 		std::unique_ptr<Scene> m_Scene;
 		std::optional<Entity> m_SelectedEntity;

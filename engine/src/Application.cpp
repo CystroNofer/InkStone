@@ -116,7 +116,7 @@ namespace NXTN {
 
 	Application::~Application()
 	{
-
+		UI::Shutdown();
 	}
 
 	void Application::Update()
@@ -143,28 +143,7 @@ namespace NXTN {
 				m_Minimized = e->GetNewWidth() < 1 || e->GetNewHeight() < 1;
 				break;
 			}
-			case EventType::MouseScroll:
-			{
-				MouseScrollEvent* e = (MouseScrollEvent*)(event_ptr);
-				m_CameraDistance = std::max(m_CameraDistance - e->GetY(), 0.1f);
-
-				break;
 			}
-			}
-
-			if (Input::IsMouseButtonPressed(MouseButtonCode::Button2)) {
-				vec2 mouseMovement = Input::GetMouseMovement();
-
-				m_CameraAngle -= mouseMovement.x * 1.5f * Time::GetDeltaTime();
-				// In [-Pi, Pi]
-				m_CameraAngle = std::fmod(m_CameraAngle, NXTN_2_PI_FLOAT);
-				if (m_CameraAngle < 0.0f)
-				{
-					m_CameraAngle += NXTN_2_PI_FLOAT;
-				}
-			}
-
-			UI::OnEvent(event_ptr);
 		}
 
 		EventBuffer::Clear();
@@ -172,32 +151,9 @@ namespace NXTN {
 		// ====================== Time ======================
 		Time::Update();
 
-		// ====================== Camera ======================
-		m_SceneCameraTransform->position = vec3(sin(m_CameraAngle) * m_CameraDistance, 0.0f, -cos(m_CameraAngle) * m_CameraDistance);
-
-		vec3 x, y;
-		vec3 z = normalize(-m_SceneCameraTransform->position);  // Look direction
-
-		// Z facing up/down - Y aligns with world Z
-		if (z.x * z.x + z.z * z.z < EPSILON_SQ) {
-			x = vec3(1, 0.0f, 0.0f);
-			y = vec3(0.0f, 0.0f, -z.y);
-		}
-		else {
-			x = normalize(vec3(z.z, 0.0f, -z.x));  // Cross((0, 1, 0), z)
-			y = normalize(cross(z, x));
-		}
-		m_SceneCameraTransform->rotation = Quaternion::FromRotationMatrix(
-			mat4(
-				x.x, y.x, z.x, 0.0f,
-				x.y, y.y, z.y, 0.0f,
-				x.z, y.z, z.z, 0.0f,
-				0.0f, 0.0f, 0.0f, 1.0f
-			)
-		);
-
 		// ====================== UI ======================
 		UI::NewFrame();
+
 		{
 			//m_LayerStack.UIUpdate();
 			// Prepare dockspace
@@ -213,12 +169,12 @@ namespace NXTN {
 			{
 				ImGui::DockSpace(m_DockspaceID, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 
-				// View window
+				// Scene view
 				ImGui::SetNextWindowDockID(m_DockspaceID, ImGuiCond_FirstUseEver);
-				ImGui::Begin("View", NULL, m_SubWindowFlag);
+				ImGui::Begin("Scene View", NULL, m_SubWindowFlag);
 				{
-					// View
 					ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+
 					// ImGui sometimes return negative viewport sizes
 					if (viewportSize.x > 0.0f && viewportSize.y > 0.0f)
 					{
@@ -232,6 +188,68 @@ namespace NXTN {
 
 						// ImGui records this image now and samples it later in UI::EndFrame().
 						ImGui::Image((ImTextureID)m_FrameBuffer->GetColorAttachment(), viewportSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+
+
+
+						// ====================== Camera ======================
+						const ImGuiIO& io = ImGui::GetIO();
+						if (io.KeyAlt && ImGui::IsMouseDown(ImGuiMouseButton_Left))
+						{
+							if (ImGui::IsItemHovered())
+							{
+								m_OrbitActive = true;
+							}
+						}
+						else
+						{
+							m_OrbitActive = false;
+						}
+						if (io.KeyAlt && ImGui::IsMouseDown(ImGuiMouseButton_Middle))
+						{
+							if (ImGui::IsItemHovered())
+							{
+								m_PanActive = true;
+							}
+						}
+						else
+						{
+							m_PanActive = false;
+						}
+
+						if (m_OrbitActive) {
+							m_CameraYaw = std::remainder(m_CameraYaw + io.MouseDelta.x * 0.005f, NXTN_2_PI_FLOAT);
+							m_CameraPitch = std::clamp(
+								m_CameraPitch + io.MouseDelta.y * 0.005f,
+								-0.5f * NXTN_PI_FLOAT + NXTN_EPSILON,
+								0.5f * NXTN_PI_FLOAT - NXTN_EPSILON
+							);
+							vec3 f = m_SceneCameraTransform->Forward();
+							Log::Info("Camera Forward: %2.2f, %2.2f, %2.2f", f.x, f.y, f.z);
+						}
+						if (m_PanActive) {
+							float worldUnitsPerPixel = m_SceneCamera->isOrthographic
+								? 2.0f * m_SceneCamera->size / viewportSize.y
+								: 2.0f * m_CameraDistance * std::tan(0.5f * m_SceneCamera->size) / viewportSize.y;
+							m_CameraTarget += m_SceneCameraTransform->Up() * (io.MouseDelta.y * worldUnitsPerPixel);
+							m_CameraTarget += m_SceneCameraTransform->Left() * (io.MouseDelta.x * worldUnitsPerPixel);
+							vec3 f = m_SceneCameraTransform->Forward();
+							Log::Info("Camera Forward: %2.2f, %2.2f, %2.2f", f.x, f.y, f.z);
+						}
+						if (io.MouseWheel != 0.0f) {
+							m_CameraDistance = std::max(0.1f, m_CameraDistance * std::pow(0.95f, io.MouseWheel));
+						}
+						m_SceneCameraTransform->rotation = Rotate(
+							Rotate(
+								Quaternion::Identity(),
+								m_CameraYaw,
+								vec3{ 0.0f, 1.0f, 0.0f }
+							),
+							m_CameraPitch,
+							vec3{ 1.0f, 0.0f, 0.0f }
+						);
+						m_SceneCameraTransform->position =
+							m_CameraTarget +
+							m_SceneCameraTransform->Backward() * m_CameraDistance;
 					}
 				}
 				ImGui::End();

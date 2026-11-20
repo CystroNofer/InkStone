@@ -39,6 +39,11 @@ namespace NXTN {
 		s_UI.reset(device->CreateUI(w, h));
 	}
 
+	void UI::Shutdown()
+	{
+		s_UI.reset();
+	}
+
 	void UI::NewFrame()
 	{
 		NXTN_PROFILE_FUNCTION()
@@ -63,13 +68,4 @@ namespace NXTN {
 		s_UI->EndFrameImpl();
 	}
 
-	void UI::OnEvent(Event*& event_ptr)
-	{
-		if (!s_UI)
-		{
-			Log::Warning("UI uninitialized");
-			return;
-		}
-		s_UI->OnEventImpl(event_ptr);
-	}
 }
