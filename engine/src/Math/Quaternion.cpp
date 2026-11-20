@@ -46,7 +46,7 @@ namespace NXTN {
 		y = w * z0 + x * y0 - y * x0 + z * w0;
 	}
 
-	vec3 Quaternion::ApplyRotation(const vec3& vector)
+	vec3 Quaternion::ApplyRotation(const vec3& vector) const
 	{
 		vec3 res = vector;
 		vec3 q(x, y, z);
