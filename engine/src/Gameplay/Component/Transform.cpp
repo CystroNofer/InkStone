@@ -7,6 +7,26 @@ namespace NXTN {
 
 	Transform::~Transform() {}
 
+	vec3 Transform::Forward() const { return rotation.ApplyRotation(vec3(0.0f, 0.0f, 1.0f)); }
+	vec3 Transform::Backward() const { return rotation.ApplyRotation(vec3(0.0f, 0.0f, -1.0f)); }
+	vec3 Transform::Right() const { return rotation.ApplyRotation(vec3(1.0f, 0.0f, 0.0f)); }
+	vec3 Transform::Left() const { return rotation.ApplyRotation(vec3(-1.0f, 0.0f, 0.0f)); }
+	vec3 Transform::Up() const { return rotation.ApplyRotation(vec3(0.0f, 1.0f, 0.0f)); }
+	vec3 Transform::Down() const { return rotation.ApplyRotation(vec3(0.0f, -1.0f, 0.0f)); }
+
+	void Transform::Rotate(const Quaternion& deltaRotation, FrameOfReference frame)
+	{
+		switch (frame)
+		{
+		case FrameOfReference::Local:
+			rotation = rotation * deltaRotation;
+			break;
+		case FrameOfReference::World:
+			rotation = deltaRotation * rotation;
+			break;
+		}
+	}
+
 	mat4 Transform::GetMMatrix() const
 	{
 		float r11 = (1.0f - 2.0f * (rotation.y * rotation.y + rotation.z * rotation.z)) * scale.x;

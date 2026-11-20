@@ -17,7 +17,7 @@ namespace NXTN {
 		float Length();
 
 		void Rotate(float angle, const vec3& axis);
-		vec3 ApplyRotation(const vec3& vector);
+		vec3 ApplyRotation(const vec3& vector) const;
 
 		mat4 ToRotationMatrix();
 		static Quaternion FromRotationMatrix(mat4 r);
