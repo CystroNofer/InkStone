@@ -8,29 +8,29 @@ namespace NXTN {
 	Material::Material(Handle<Shader> shaderHandle)
 		: m_ShaderHandle(shaderHandle)
 	{
-		for (const ShaderUniformDescriptor& uniform : ShaderManager::Get(shaderHandle)->GetUniformList())
+		for (const ShaderVariableDescriptor& uniform : ShaderManager::Get(shaderHandle)->GetUniformList())
 		{
 			switch (uniform.type)
 			{
-			case ShaderUniformType::Int:
+			case ShaderVariableType::Int:
 				m_Parameters[uniform.name] = { uniform.type, 0 };
 				break;
-			case ShaderUniformType::UInt:
+			case ShaderVariableType::UInt:
 				m_Parameters[uniform.name] = { uniform.type, 0u };
 				break;
-			case ShaderUniformType::Float:
+			case ShaderVariableType::Float:
 				m_Parameters[uniform.name] = { uniform.type, 0.0f };
 				break;
-			case ShaderUniformType::Float3:
+			case ShaderVariableType::Float3:
 				m_Parameters[uniform.name] = { uniform.type, vec3(0.0f) };
 				break;
-			case ShaderUniformType::Float4:
+			case ShaderVariableType::Float4:
 				m_Parameters[uniform.name] = { uniform.type, vec4(0.0f) };
 				break;
-			case ShaderUniformType::Mat4:
+			case ShaderVariableType::Mat4:
 				m_Parameters[uniform.name] = { uniform.type, mat4(1.0f) };
 				break;
-			case ShaderUniformType::Tex2D:
+			case ShaderVariableType::Tex2D:
 				m_Parameters[uniform.name] = { uniform.type, Handle<Texture2D>() };
 				break;
 			default:
@@ -57,25 +57,25 @@ namespace NXTN {
 		{
 			switch (param.type)
 			{
-			case ShaderUniformType::Int:
+			case ShaderVariableType::Int:
 				shader->SetUniformInt(name, std::get<int>(param.value));
 				break;
-			case ShaderUniformType::UInt:
+			case ShaderVariableType::UInt:
 				shader->SetUniformUInt(name, std::get<unsigned int>(param.value));
 				break;
-			case ShaderUniformType::Float:
+			case ShaderVariableType::Float:
 				shader->SetUniformFloat(name, std::get<float>(param.value));
 				break;
-			case ShaderUniformType::Float3:
+			case ShaderVariableType::Float3:
 				shader->SetUniformFloat3(name, std::get<vec3>(param.value).x, std::get<vec3>(param.value).y, std::get<vec3>(param.value).z);
 				break;
-			case ShaderUniformType::Float4:
+			case ShaderVariableType::Float4:
 				shader->SetUniformFloat4(name, std::get<vec4>(param.value).x, std::get<vec4>(param.value).y, std::get<vec4>(param.value).z, std::get<vec4>(param.value).w);
 				break;
-			case ShaderUniformType::Mat4:
+			case ShaderVariableType::Mat4:
 				shader->SetUniformMat4(name, std::get<mat4>(param.value));
 				break;
-			case ShaderUniformType::Tex2D:
+			case ShaderVariableType::Tex2D:
 			{
 				Texture2D* texPtr = TextureManager::Get(std::get<Handle<Texture2D>>(param.value));
 				if (texPtr == nullptr)
@@ -113,7 +113,7 @@ namespace NXTN {
 			Log::Warning("Uniform name %s not found in material.", name.c_str());
 			return;
 		}
-		if (m_Parameters[name].type != ShaderUniformType::Int)
+		if (m_Parameters[name].type != ShaderVariableType::Int)
 		{
 			Log::Warning("Uniform %s type mismatch.", name.c_str());
 			return;
@@ -124,7 +124,7 @@ namespace NXTN {
 			Log::Warning("Material shader is invalid.");
 			return;
 		}
-		m_Parameters[name] = { ShaderUniformType::Int, i };
+		m_Parameters[name] = { ShaderVariableType::Int, i };
 	}
 
 	void Material::SetUniformUInt(const std::string& name, unsigned int i)
@@ -134,7 +134,7 @@ namespace NXTN {
 			Log::Warning("Uniform name %s not found in material.", name.c_str());
 			return;
 		}
-		if (m_Parameters[name].type != ShaderUniformType::UInt)
+		if (m_Parameters[name].type != ShaderVariableType::UInt)
 		{
 			Log::Warning("Uniform %s type mismatch.", name.c_str());
 			return;
@@ -145,7 +145,7 @@ namespace NXTN {
 			Log::Warning("Material shader is invalid.");
 			return;
 		}
-		m_Parameters[name] = { ShaderUniformType::UInt, i };
+		m_Parameters[name] = { ShaderVariableType::UInt, i };
 	}
 
 	void Material::SetUniformFloat(const std::string& name, float f)
@@ -155,7 +155,7 @@ namespace NXTN {
 			Log::Warning("Uniform name %s not found in material.", name.c_str());
 			return;
 		}
-		if (m_Parameters[name].type != ShaderUniformType::Float)
+		if (m_Parameters[name].type != ShaderVariableType::Float)
 		{
 			Log::Warning("Uniform %s type mismatch.", name.c_str());
 			return;
@@ -166,7 +166,7 @@ namespace NXTN {
 			Log::Warning("Material shader is invalid.");
 			return;
 		}
-		m_Parameters[name] = { ShaderUniformType::Float, f };
+		m_Parameters[name] = { ShaderVariableType::Float, f };
 	}
 
 	void Material::SetUniformFloat3(const std::string& name, const vec3& f3)
@@ -176,7 +176,7 @@ namespace NXTN {
 			Log::Warning("Uniform name %s not found in material.", name.c_str());
 			return;
 		}
-		if (m_Parameters[name].type != ShaderUniformType::Float3)
+		if (m_Parameters[name].type != ShaderVariableType::Float3)
 		{
 			Log::Warning("Uniform %s type mismatch.", name.c_str());
 			return;
@@ -187,7 +187,7 @@ namespace NXTN {
 			Log::Warning("Material shader is invalid.");
 			return;
 		}
-		m_Parameters[name] = { ShaderUniformType::Float3, f3 };
+		m_Parameters[name] = { ShaderVariableType::Float3, f3 };
 	}
 
 	void Material::SetUniformFloat4(const std::string& name, const vec4& f4)
@@ -197,7 +197,7 @@ namespace NXTN {
 			Log::Warning("Uniform name %s not found in material.", name.c_str());
 			return;
 		}
-		if (m_Parameters[name].type != ShaderUniformType::Float4)
+		if (m_Parameters[name].type != ShaderVariableType::Float4)
 		{
 			Log::Warning("Uniform %s type mismatch.", name.c_str());
 			return;
@@ -208,7 +208,7 @@ namespace NXTN {
 			Log::Warning("Material shader is invalid.");
 			return;
 		}
-		m_Parameters[name] = { ShaderUniformType::Float4, f4 };
+		m_Parameters[name] = { ShaderVariableType::Float4, f4 };
 	}
 
 	void Material::SetUniformMat4(const std::string& name, const mat4& m)
@@ -218,7 +218,7 @@ namespace NXTN {
 			Log::Warning("Uniform name %s not found in material.", name.c_str());
 			return;
 		}
-		if (m_Parameters[name].type != ShaderUniformType::Mat4)
+		if (m_Parameters[name].type != ShaderVariableType::Mat4)
 		{
 			Log::Warning("Uniform %s type mismatch.", name.c_str());
 			return;
@@ -229,7 +229,7 @@ namespace NXTN {
 			Log::Warning("Material shader is invalid.");
 			return;
 		}
-		m_Parameters[name] = { ShaderUniformType::Mat4, m };
+		m_Parameters[name] = { ShaderVariableType::Mat4, m };
 	}
 
 	void Material::SetUniformTex2D(const std::string& name, Handle<Texture2D> texHandle)
@@ -239,7 +239,7 @@ namespace NXTN {
 			Log::Warning("Uniform name %s not found in material.", name.c_str());
 			return;
 		}
-		if (m_Parameters[name].type != ShaderUniformType::Tex2D)
+		if (m_Parameters[name].type != ShaderVariableType::Tex2D)
 		{
 			Log::Warning("Uniform %s type mismatch.", name.c_str());
 			return;
@@ -250,6 +250,6 @@ namespace NXTN {
 			Log::Warning("Material shader is invalid.");
 			return;
 		}
-		m_Parameters[name] = { ShaderUniformType::Tex2D, texHandle };
+		m_Parameters[name] = { ShaderVariableType::Tex2D, texHandle };
 	}
 }

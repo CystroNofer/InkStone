@@ -67,14 +67,10 @@ namespace NXTN {
 		return new OpenGLFrameBuffer(width, height);
 	}
 
-	Shader* OpenGLGraphicsDevice::CreateShader(const ShaderProgramDescriptor& description)
+	std::expected<Shader*, std::string> OpenGLGraphicsDevice::CreateShader(
+		const std::vector<ShaderStageIntermediateDescriptor>& stageIntermediates
+	)
 	{
-		OpenGLShader* shader = new OpenGLShader(description);
-		if (!shader->IsValid())
-		{
-			delete shader;
-			return nullptr;
-		}
-		return shader;
+		return OpenGLShader::Create(stageIntermediates);
 	}
 }

@@ -15,6 +15,8 @@ namespace NXTN {
 		VertexArray* CreateVertexArray(std::shared_ptr<VertexBuffer> vertexBuffer, const VertexArrayLayout& layout) override;
 		Texture2D* CreateTexture2D(const std::string& filepath) override;
 		FrameBuffer* CreateFrameBuffer(unsigned int width, unsigned int height) override;
-		Shader* CreateShader(const ShaderProgramDescriptor& description) override;
+		std::expected<Shader*, std::string> CreateShader(
+			const std::vector<ShaderStageIntermediateDescriptor>& stageIntermediates
+		) override;
 	};
 }

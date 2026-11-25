@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Core.h"
+#include "Shader.h"
+
+#include <expected>
 #include <memory>
 
 namespace NXTN {
@@ -8,7 +11,6 @@ namespace NXTN {
 	class IndexBuffer;
 	class Renderer;
 	class Shader;
-	struct ShaderProgramDescriptor;
 	class Texture2D;
 	class UI;
 	class VertexArray;
@@ -31,10 +33,15 @@ namespace NXTN {
 		virtual IndexBuffer* CreateIndexBuffer(const unsigned int* indices, unsigned int count) = 0;
 		virtual VertexArray* CreateVertexArray(VertexBuffer* vertexBuffer, const VertexArrayLayout& layout) = 0;
 		// Shared-owner overload for exception-safe uploads and buffer reuse.
-		virtual VertexArray* CreateVertexArray(std::shared_ptr<VertexBuffer> vertexBuffer, const VertexArrayLayout& layout) = 0;
+		virtual VertexArray* CreateVertexArray(
+			std::shared_ptr<VertexBuffer> vertexBuffer,
+			const VertexArrayLayout& layout
+		) = 0;
 		virtual Texture2D* CreateTexture2D(const std::string& filepath) = 0;
 		virtual FrameBuffer* CreateFrameBuffer(unsigned int width, unsigned int height) = 0;
-		virtual Shader* CreateShader(const ShaderProgramDescriptor& description) = 0;
+		virtual std::expected<Shader*, std::string> CreateShader(
+			const std::vector<ShaderStageIntermediateDescriptor>& stageIntermediates
+		) = 0;
 
 	protected:
 		GraphicsDevice() = default;
