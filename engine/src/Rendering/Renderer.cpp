@@ -17,6 +17,11 @@ namespace NXTN {
 		s_Renderer.reset(GraphicsDevice::Get()->CreateRenderer());
 	}
 
+	void Renderer::Shutdown()
+	{
+		s_Renderer.reset();
+	}
+
 	void Renderer::SetVPMatrix(const mat4& vpMatrix)
 	{
 		if (!s_Renderer)

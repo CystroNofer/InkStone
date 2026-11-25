@@ -32,4 +32,9 @@ namespace NXTN {
 	{
 		return s_Map2D.Validate(th);
 	}
+
+	void TextureManager::Shutdown()
+	{
+		s_Map2D.Clear();
+	}
 }

@@ -63,7 +63,7 @@ namespace NXTN {
 			for (const std::shared_ptr<Mesh>& mesh : model.meshes) { ModelValidation::Require(mesh != nullptr, "Model contains a null mesh"); }
 			ModelValidation::Require(MaterialManager::Get(material) != nullptr, "Invalid material handle");
 			ModelValidation::Require(!parent || TryGetComponent<Transform>(*parent), "Instance parent must be live and have Transform");
-			size_t count = model.nodes.size() + 1;
+			size_t count = model.nodes.size();
 			for (const ModelNode& node : model.nodes) {
 				if (node.meshes.size() > 1) {
 					count += node.meshes.size();
@@ -74,10 +74,10 @@ namespace NXTN {
 			std::vector<Entity> nodeEntities;
 			nodeEntities.reserve(model.nodes.size());
 			const std::string filename = std::filesystem::path(model.source).filename().string();
-			created.push_back(NewEntity<Transform>(filename.empty() ? "Model Instance" : filename));
-			SetParent(created.front(), parent);
 			for (const ModelNode& node : model.nodes) {
-				Entity entity = NewEntity<Transform>(node.name.empty() ? "Unnamed Node" : node.name);
+				std::string entityName = node.name.empty() ? "Unnamed Node" : node.name;
+				if (nodeEntities.empty() && !filename.empty()) { entityName = filename; }
+				Entity entity = NewEntity<Transform>(std::move(entityName));
 				created.push_back(entity);
 				nodeEntities.push_back(entity);
 				Transform* transform = TryGetComponent<Transform>(entity);
@@ -85,7 +85,9 @@ namespace NXTN {
 				transform->position = node.localTransform.position;
 				transform->rotation = node.localTransform.rotation;
 				transform->scale = node.localTransform.scale;
-				SetParent(entity, node.parent ? nodeEntities[*node.parent] : created.front());
+				ModelValidation::Require(SetParent(entity,
+					node.parent ? std::optional<Entity>(nodeEntities[*node.parent]) : parent),
+					"Could not parent model node");
 				if (node.meshes.size() == 1) {
 					ModelValidation::Require(AddComponent<Renderable>(entity, model.meshes[node.meshes.front()], material), "Could not create Renderable");
 				}

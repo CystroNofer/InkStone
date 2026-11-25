@@ -3,6 +3,7 @@
 #include "Application.h"
 
 #include "GLAD/glad.h"
+#include "Rendering/GraphicsDevice.h"
 
 namespace NXTN {
 	Application::Application() : m_Alive(true), m_Minimized(false)
@@ -97,7 +98,7 @@ namespace NXTN {
 		//	),
 		//	m_MaterialHandle
 		//);
-		std::expected<ModelData, ModelError> importResult = ModelLoader::Import("../asset/Model/ShaderBall-master/shaderBallNoCrease/shaderBall.obj");
+		std::expected<ModelData, ModelError> importResult = ModelLoader::Import("../asset/Model/CornellBox/CornellBox-Original.obj");
 		if (importResult) {
 			std::expected<Model, ModelError> uploadResult = ModelLoader::Upload(*importResult);
 			if (uploadResult) {
@@ -116,7 +117,15 @@ namespace NXTN {
 
 	Application::~Application()
 	{
+		m_Scene.reset();
+		m_FrameBuffer.reset();
 		UI::Shutdown();
+		MaterialManager::Shutdown();
+		TextureManager::Shutdown();
+		ShaderManager::Shutdown();
+		Renderer::Shutdown();
+		GraphicsDevice::Shutdown();
+		WindowManager::Shutdown();
 	}
 
 	void Application::Update()
@@ -224,7 +233,6 @@ namespace NXTN {
 								0.5f * NXTN_PI_FLOAT - NXTN_EPSILON
 							);
 							vec3 f = m_SceneCameraTransform->Forward();
-							Log::Info("Camera Forward: %2.2f, %2.2f, %2.2f", f.x, f.y, f.z);
 						}
 						if (m_PanActive) {
 							float worldUnitsPerPixel = m_SceneCamera->isOrthographic
@@ -233,7 +241,6 @@ namespace NXTN {
 							m_CameraTarget += m_SceneCameraTransform->Up() * (io.MouseDelta.y * worldUnitsPerPixel);
 							m_CameraTarget += m_SceneCameraTransform->Left() * (io.MouseDelta.x * worldUnitsPerPixel);
 							vec3 f = m_SceneCameraTransform->Forward();
-							Log::Info("Camera Forward: %2.2f, %2.2f, %2.2f", f.x, f.y, f.z);
 						}
 						if (io.MouseWheel != 0.0f) {
 							m_CameraDistance = std::max(0.1f, m_CameraDistance * std::pow(0.95f, io.MouseWheel));

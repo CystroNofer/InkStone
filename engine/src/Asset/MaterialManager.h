@@ -12,6 +12,7 @@ namespace NXTN {
 		static Handle<Material> Create(Handle<Shader> shaderHandle);
 		static Material* Get(Handle<Material> mh);
 		static bool Validate(Handle<Material> mh);
+		static void Shutdown();
 
 	private:
 		MaterialManager() = default;

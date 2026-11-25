@@ -34,4 +34,9 @@ namespace NXTN {
 	{
 		return s_Device.get();
 	}
+
+	void GraphicsDevice::Shutdown()
+	{
+		s_Device.reset();
+	}
 }

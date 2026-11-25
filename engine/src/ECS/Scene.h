@@ -116,7 +116,7 @@ namespace NXTN {
 
 		void Render(Camera& camera, const Transform& cameraTransform);
 
-		// Creates an instance root, preserves model nodes, and shares uploaded meshes.
+		// Uses the imported root as the instance root and shares uploaded meshes.
 		// Do not call inside Each(); this does not load files or allocate GPU geometry.
 		std::expected<Entity, ModelError> InstantiateModel(
 			const Model& model, Handle<Material> material,

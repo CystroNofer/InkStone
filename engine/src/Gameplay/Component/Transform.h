@@ -4,7 +4,7 @@
 #include "Math/Math.h"
 
 namespace NXTN {
-	class Transform : public BaseComponent {
+	class Transform : public ECSComponent {
 	public:
 		Transform();
 		~Transform();

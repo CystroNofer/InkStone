@@ -12,6 +12,7 @@ namespace NXTN {
 		static Handle<Texture2D> Create(const std::string& filepath);
 		static Texture2D* Get(Handle<Texture2D> th);
 		static bool Validate(Handle<Texture2D> th);
+		static void Shutdown();
 
 	private:
 		TextureManager() = default;

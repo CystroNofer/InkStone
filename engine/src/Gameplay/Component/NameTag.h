@@ -5,7 +5,7 @@
 #include <string>
 
 namespace NXTN {
-	class NameTag : public BaseComponent {
+	class NameTag : public ECSComponent {
 	public:
 		NameTag() = default;
 		NameTag(const std::string& name) : name(name) {}

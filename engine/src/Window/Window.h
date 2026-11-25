@@ -47,6 +47,7 @@ namespace NXTN {
 		// And the copy constructor is deleted
 		static Window* Get(Handle<Window>& wh);
 		static void Destroy(Handle<Window>& wh);
+		static void Shutdown();
 		static void OnFocused(Handle<Window> wh, bool focused);
 		static Window* GetFocused();
 

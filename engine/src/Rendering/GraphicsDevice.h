@@ -21,6 +21,7 @@ namespace NXTN {
 		virtual ~GraphicsDevice() = default;
 
 		static bool Init();
+		static void Shutdown();
 		static GraphicsDevice* Get();
 
 		virtual Renderer* CreateRenderer() = 0;

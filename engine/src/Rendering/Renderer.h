@@ -30,6 +30,7 @@ namespace NXTN {
 		static void ClearFrameBuffer();
 
 		static void Init();
+		static void Shutdown();
 
 	protected:
 		// Virtual

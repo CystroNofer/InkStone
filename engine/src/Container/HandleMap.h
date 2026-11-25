@@ -53,6 +53,18 @@ namespace NXTN {
 			}
 		}
 
+		void Clear()
+		{
+			for (std::pair<uint32_t, std::unique_ptr<T>>& slot : m_Map)
+			{
+				if (slot.second)
+				{
+					slot.second.reset();
+					++slot.first;
+				}
+			}
+		}
+
 	private:
 		// Get() should return T*
 		// If the vector stores T then it will relocate when scaling

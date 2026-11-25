@@ -52,6 +52,16 @@ namespace NXTN {
 		s_Windows.Remove(wh);
 	}
 
+	void WindowManager::Shutdown()
+	{
+		s_Windows.Clear();
+		s_LastFocusedHandle = Handle<Window>();
+		if (APISetting::GetWindowAPI() == WindowAPI::GLFW)
+		{
+			glfwTerminate();
+		}
+	}
+
 	void WindowManager::OnFocused(Handle<Window> wh, bool focused)
 	{
 		if (focused && s_Windows.Validate(wh)) {

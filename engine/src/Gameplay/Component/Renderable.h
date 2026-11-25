@@ -6,7 +6,7 @@
 #include "Math/Math.h"
 
 namespace NXTN {
-	class Renderable : public BaseComponent
+	class Renderable : public ECSComponent
 	{
 	public:
 		Renderable();

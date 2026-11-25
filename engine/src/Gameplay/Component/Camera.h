@@ -4,7 +4,7 @@
 #include "Math/Math.h"
 
 namespace NXTN {
-    class Camera : public BaseComponent
+    class Camera : public ECSComponent
     {
     public:
 		// Perspective size is specified in degrees and stored in radians.

@@ -19,4 +19,9 @@ namespace NXTN {
 	{
 		return s_Map.Validate(mh);
 	}
+
+	void MaterialManager::Shutdown()
+	{
+		s_Map.Clear();
+	}
 }

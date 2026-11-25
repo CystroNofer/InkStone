@@ -11,17 +11,17 @@ namespace NXTN {
 	typedef uint32_t ComponentID; // Platform-independent
 	constexpr ComponentID COMPONENT_ID_MAX = UINT32_MAX;
 
-	class BaseComponent {
+	class ECSComponent {
 	public:
 		static constexpr bool UNIQUE_PER_ENTITY = true;
 	protected:
-		virtual ~BaseComponent() = default;
+		virtual ~ECSComponent() = default;
 	};
 
 	template <typename C>
 	concept IsComponent = std::derived_from<
 		std::remove_cvref_t<C>,
-		BaseComponent
+		ECSComponent
 	>;
 
 	// For component to type ID mapping

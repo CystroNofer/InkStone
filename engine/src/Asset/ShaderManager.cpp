@@ -30,4 +30,9 @@ namespace NXTN {
 	bool ShaderManager::Validate(Handle<Shader> sh) {
 		return s_Map.Validate(sh);
 	}
+
+	void ShaderManager::Shutdown()
+	{
+		s_Map.Clear();
+	}
 }

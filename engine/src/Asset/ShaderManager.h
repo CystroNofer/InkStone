@@ -12,6 +12,7 @@ namespace NXTN {
 		static Handle<Shader> Load(const ShaderProgramDescriptor& description);
 		static Shader* Get(Handle<Shader> sh);
 		static bool Validate(Handle<Shader> sh);
+		static void Shutdown();
 
 	private:
 		ShaderManager() = default;
