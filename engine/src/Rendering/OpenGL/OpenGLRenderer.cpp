@@ -44,8 +44,9 @@ namespace NXTN {
 			Material* material = MaterialManager::Get(item.materialHandle);
 			if (!item.meshRef || !material) { continue; }
 			// Material setters update cached values; Bind uploads them for this draw.
-			material->SetUniformMat4("u_ModelMatrix", item.mMatrix);
-			material->SetUniformMat4("u_VPMatrix", m_VPMatrix);
+			material->SetUniformMat4("NXTN_MATRIX_M", item.mMatrix);
+			material->SetUniformMat4("NXTN_MATRIX_VP", m_VPMatrix);
+			material->SetUniformMat4("NXTN_MATRIX_MVP", mul(m_VPMatrix, item.mMatrix));
 			material->Bind();
 			item.meshRef->Bind();
 

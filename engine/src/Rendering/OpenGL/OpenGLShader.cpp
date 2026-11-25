@@ -79,20 +79,38 @@ namespace NXTN {
 			// Emit GLSL code
 			std::string stageCode = "#version 450 core\n\n";
 			// Input
-			size_t location = 0;
-			for (const ShaderVariableDescriptor& input : intermediate.inputs) {
-				stageCode +=
-					"layout(location = " +
-					std::to_string(location++) +
-					") in " +
-					ShaderVariableTypeToString(input.type) +
-					" " +
-					input.name +
-					";\n";
+			if (intermediate.stage == ShaderStage::Vertex)
+			{
+				size_t location = 0;
+				for (const ShaderVariableDescriptor& input : intermediate.inputs) {
+					stageCode +=
+						"layout(location = " +
+						std::to_string(location++) +
+						") in " +
+						ShaderVariableTypeToString(input.type) +
+						" " +
+						input.name +
+						";\n";
+				}
+			}
+			else {
+				for (const ShaderVariableDescriptor& input : intermediate.inputs) {
+					stageCode +=
+						"in " +
+						ShaderVariableTypeToString(input.type) +
+						" " +
+						input.name +
+						";\n";
+				}
 			}
 
 			// Uniform
-			stageCode += "\nuniform mat4 NXTN_MATRIX_M;\nuniform mat4 NXTN_MATRIX_VP;\n";
+			stageCode +=
+R"(
+uniform mat4 NXTN_MATRIX_M;
+uniform mat4 NXTN_MATRIX_VP;
+uniform mat4 NXTN_MATRIX_MVP;
+)";
 			for (const ShaderVariableDescriptor& uniform : intermediate.uniforms) {
 				stageCode +=
 					"uniform " +
@@ -116,6 +134,8 @@ namespace NXTN {
 			// Code
 			stageCode += "\n";
 			stageCode += intermediate.code;
+
+			Log::Info(stageCode);
 
 			// Compile
 			GLenum openGLStage;
@@ -177,7 +197,7 @@ namespace NXTN {
 			std::vector<char> msg(static_cast<size_t>(std::max(msgLength, 1)));
 			glGetProgramInfoLog(program, msgLength, nullptr, msg.data());
 			discardProgram();
-			return std::unexpected("Failed to link shader program: " + std::string(msg.data()));
+			return std::unexpected("Failed to link shader program:\n" + std::string(msg.data()));
 		}
 
 		for (unsigned int shader : compiledShaders)

@@ -9,36 +9,6 @@
 
 namespace NXTN {
 	namespace {
-		const std::string source = R"(
-			INPUT
-			{
-				vec3 a_PositionOS;
-				vec2 a_TexCoord;
-			}
-
-			UNIFORM
-			{
-	
-			}
-
-			OUTPUT
-			{
-				vec2 v_TexCoord;
-			}
-
-			CODE
-			{
-				// Test line comment
-				/* Test block comment */
-				void main()
-				{
-					v_TexCoord = a_TexCoord;
-
-					gl_Position = u_VPMatrix * u_ModelMatrix * vec4(a_PositionOS, 1);
-				}
-			}
-		)";
-
 		const std::regex headerPattern(
 			R"(^[ \t]*(INPUT|UNIFORM|OUTPUT|CODE)\s*\{)",
 			std::regex_constants::ECMAScript | std::regex_constants::multiline
@@ -68,12 +38,12 @@ namespace NXTN {
 
 		std::vector<ShaderStageIntermediateDescriptor> stageIntermediates;
 		for (const ShaderStageDescriptor& stage : stages) {
-			std::ifstream input(stage.filepath, std::ios::binary);
-			if (!input)
+			std::ifstream fileStream(stage.filepath, std::ios::binary);
+			if (!fileStream)
 				return std::unexpected("Cannot open shader at " + stage.filepath);
 
 			std::string sourceText(
-				std::istreambuf_iterator<char>{input},
+				std::istreambuf_iterator<char>{fileStream},
 				std::istreambuf_iterator<char>{}
 			);
 
@@ -94,19 +64,19 @@ namespace NXTN {
 						const unsigned char next = static_cast<unsigned char>(sourceText[pos + 1]);
 						if (next == '/') {
 							// Line comment
-							size_t end = sourceText.find('\n', pos + 2);
-							if (end == std::string::npos) {
+							size_t endPos = sourceText.find('\n', pos + 2);
+							if (endPos == std::string::npos) {
 								sourceText.erase(pos);
 								break;
 							}
 							else {
-								sourceText.erase(pos, end - pos);
+								sourceText.erase(pos, endPos - pos);
 							}
 						}
 						else if (next == '*') {
 							// Block comment
-							size_t end = sourceText.find("*/", pos + 2);
-							if (end == std::string::npos) {
+							size_t endPos = sourceText.find("*/", pos + 2);
+							if (endPos == std::string::npos) {
 								return std::unexpected(
 									"Unterminated block comment at line " +
 									std::to_string(line) +
@@ -115,7 +85,7 @@ namespace NXTN {
 								);
 							}
 							else {
-								sourceText.replace(pos, end - pos + 2, 1, ' ');
+								sourceText.replace(pos, endPos - pos + 2, 1, ' ');
 							}
 						}
 						else {
@@ -131,14 +101,15 @@ namespace NXTN {
 				}
 			}
 
-			// Parse sections
+			// Parse sections / generate intermediates
 			stageIntermediates.push_back(ShaderStageIntermediateDescriptor());
 			ShaderStageIntermediateDescriptor& intermediate = stageIntermediates.back();
 			intermediate.stage = stage.stage;
+
 			std::sregex_iterator end{};
 			for (std::sregex_iterator section_itr(
-				source.begin(),
-				source.end(),
+				sourceText.begin(),
+				sourceText.end(),
 				headerPattern
 			); section_itr != end; section_itr++)
 			{
@@ -152,10 +123,10 @@ namespace NXTN {
 
 				size_t contentEnd =
 					(next == end)
-					? source.size()
+					? sourceText.size()
 					: next->position();
 
-				std::string sectionContent = source.substr(
+				std::string sectionContent = sourceText.substr(
 					contentStart,
 					contentEnd - contentStart
 				);
@@ -239,6 +210,11 @@ namespace NXTN {
 						}
 					}
 				}
+			}
+			if (intermediate.code.empty()) {
+				return std::unexpected(
+					"Missing CODE section in shader at " + stage.filepath
+				);
 			}
 		}
 		std::expected<Shader*, std::string> result = device->CreateShader(stageIntermediates);

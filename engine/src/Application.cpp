@@ -80,8 +80,10 @@ namespace NXTN {
 		std::expected<Handle<Shader>, std::string> shaderLoadResult = ShaderManager::Load(
 			"TestShader",
 			{
-				{ ShaderStage::Vertex, "../asset/Shader/Texture.vert" },
-				{ ShaderStage::Fragment, "../asset/Shader/Texture.frag" }
+				//{ ShaderStage::Vertex, "../asset/Shader/Texture.vert" },
+				//{ ShaderStage::Fragment, "../asset/Shader/Texture.frag" }
+				{ ShaderStage::Vertex, "../asset/Shader/TestSyntax.vert" },
+				{ ShaderStage::Fragment, "../asset/Shader/TestSyntax.frag" }
 			}
 		);
 		if (shaderLoadResult) {
