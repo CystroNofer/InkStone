@@ -3,78 +3,144 @@
 #include "OpenGLShader.h"
 
 namespace NXTN {
-	ShaderUniformType ConvertGLShaderUniformType(GLenum type)
-	{
-		switch (type)
+	namespace {
+		ShaderVariableType ConvertGLShaderUniformType(GLenum type)
 		{
-		case GL_INT:          return ShaderUniformType::Int;
-		case GL_UNSIGNED_INT: return ShaderUniformType::UInt;
-		case GL_FLOAT:        return ShaderUniformType::Float;
-		case GL_FLOAT_VEC2:   return ShaderUniformType::Float2;
-		case GL_FLOAT_VEC3:   return ShaderUniformType::Float3;
-		case GL_FLOAT_VEC4:   return ShaderUniformType::Float4;
-		case GL_FLOAT_MAT4:   return ShaderUniformType::Mat4;
-		case GL_BOOL:         return ShaderUniformType::Bool;
-		case GL_SAMPLER_2D:   return ShaderUniformType::Tex2D;
-		case GL_SAMPLER_CUBE: return ShaderUniformType::TexCube;
-		default:              return ShaderUniformType::ErrorType;
+			switch (type)
+			{
+			case GL_INT:          return ShaderVariableType::Int;
+			case GL_UNSIGNED_INT: return ShaderVariableType::UInt;
+			case GL_FLOAT:        return ShaderVariableType::Float;
+			case GL_FLOAT_VEC2:   return ShaderVariableType::Float2;
+			case GL_FLOAT_VEC3:   return ShaderVariableType::Float3;
+			case GL_FLOAT_VEC4:   return ShaderVariableType::Float4;
+			case GL_FLOAT_MAT4:   return ShaderVariableType::Mat4;
+			case GL_BOOL:         return ShaderVariableType::Bool;
+			case GL_SAMPLER_2D:   return ShaderVariableType::Tex2D;
+			case GL_SAMPLER_CUBE: return ShaderVariableType::TexCube;
+			default:              return ShaderVariableType::ErrorType;
+			}
+		}
+
+		std::string ShaderVariableTypeToString(ShaderVariableType type)
+		{
+			switch (type)
+			{
+			case ShaderVariableType::Int:          return "int";
+			case ShaderVariableType::UInt:         return "uint";
+			case ShaderVariableType::Float:        return "float";
+			case ShaderVariableType::Float2:       return "vec2";
+			case ShaderVariableType::Float3:       return "vec3";
+			case ShaderVariableType::Float4:       return "vec4";
+			case ShaderVariableType::Mat4:         return "mat4";
+			case ShaderVariableType::Bool:         return "bool";
+			case ShaderVariableType::Tex2D:        return "sampler2D";
+			case ShaderVariableType::TexCube:      return "samplerCube";
+			default:                               return "unknown";
+			}
 		}
 	}
 
-	OpenGLShader::OpenGLShader(const ShaderProgramDescriptor& description)
+	std::expected<OpenGLShader*, std::string> OpenGLShader::Create(
+		const std::vector<ShaderStageIntermediateDescriptor>& stageIntermediates
+	)
 	{
-		Compile(description);
-	}
-
-	OpenGLShader::~OpenGLShader()
-	{
-		if (m_RendererID != 0)
-		{
-			glDeleteProgram(m_RendererID);
-		}
-	}
-
-	void OpenGLShader::Compile(const ShaderProgramDescriptor& description)
-	{
-		if (description.stages.empty())
-		{
-			Log::Warning("Cannot create a shader program without shader modules");
-			return;
-		}
+		// Assume intermediates are valid from the caller
 
 		unsigned int program = glCreateProgram();
 		if (program == 0)
 		{
-			Log::Warning("Failed to create shader program");
-			return;
+			return std::unexpected("Failed to create shader program");
 		}
-
-		std::vector<unsigned int> shaderHandles;
+		std::vector<unsigned int> compiledShaders;
 		const std::function<void()> discardProgram = [&]()
 			{
-				for (unsigned int shader : shaderHandles)
+				for (unsigned int shader : compiledShaders)
 				{
 					glDetachShader(program, shader);
 					glDeleteShader(shader);
 				}
-				shaderHandles.clear();
+				compiledShaders.clear();
 				glDeleteProgram(program);
 			};
-
 		std::vector<ShaderStage> compiledStages;
 
-		for (const ShaderStageDescriptor& module : description.stages)
-		{
-			if (std::find(compiledStages.begin(), compiledStages.end(), module.stage) != compiledStages.end())
+		for (const ShaderStageIntermediateDescriptor& intermediate : stageIntermediates) {
+			if (std::find(
+				compiledStages.begin(),
+				compiledStages.end(),
+				intermediate.stage
+			) != compiledStages.end())
 			{
-				Log::Warning("Shader program contains a duplicate shader stage at %s", module.filepath.c_str());
 				discardProgram();
-				return;
+				return std::unexpected("Duplicate shader stage found");
 			}
 
-			GLenum openGLStage = 0;
-			const char* stageName = nullptr;
-			switch (module.stage)
+			// Emit GLSL code
+			std::string stageCode = "#version 450 core\n\n";
+			// Input
+			if (intermediate.stage == ShaderStage::Vertex)
+			{
+				size_t location = 0;
+				for (const ShaderVariableDescriptor& input : intermediate.inputs) {
+					stageCode +=
+						"layout(location = " +
+						std::to_string(location++) +
+						") in " +
+						ShaderVariableTypeToString(input.type) +
+						" " +
+						input.name +
+						";\n";
+				}
+			}
+			else {
+				for (const ShaderVariableDescriptor& input : intermediate.inputs) {
+					stageCode +=
+						"in " +
+						ShaderVariableTypeToString(input.type) +
+						" " +
+						input.name +
+						";\n";
+				}
+			}
+
+			// Uniform
+			stageCode +=
+R"(
+uniform mat4 NXTN_MATRIX_M;
+uniform mat4 NXTN_MATRIX_VP;
+uniform mat4 NXTN_MATRIX_MVP;
+)";
+			for (const ShaderVariableDescriptor& uniform : intermediate.uniforms) {
+				stageCode +=
+					"uniform " +
+					ShaderVariableTypeToString(uniform.type) +
+					" " +
+					uniform.name +
+					";\n";
+			}
+
+			// Output
+			stageCode += "\n";
+			for (const ShaderVariableDescriptor& output : intermediate.outputs) {
+				stageCode +=
+					"out " +
+					ShaderVariableTypeToString(output.type) +
+					" " +
+					output.name +
+					";\n";
+			}
+
+			// Code
+			stageCode += "\n";
+			stageCode += intermediate.code;
+
+			Log::Info(stageCode);
+
+			// Compile
+			GLenum openGLStage;
+			std::string stageName;  // For error messages
+			switch (intermediate.stage)
 			{
 			case ShaderStage::Vertex:
 				openGLStage = GL_VERTEX_SHADER;
@@ -85,46 +151,19 @@ namespace NXTN {
 				stageName = "fragment";
 				break;
 			default:
-				Log::Warning("Unsupported shader stage at %s", module.filepath.c_str());
 				discardProgram();
-				return;
-			}
-
-			std::ifstream input(module.filepath, std::ios::in | std::ios::binary);
-			if (!input)
-			{
-				Log::Warning("Cannot open %s shader source at %s", stageName, module.filepath.c_str());
-				discardProgram();
-				return;
-			}
-
-			std::ostringstream sourceStream;
-			sourceStream << input.rdbuf();
-			if (input.bad())
-			{
-				Log::Warning("Failed to read %s shader source at %s", stageName, module.filepath.c_str());
-				discardProgram();
-				return;
-			}
-
-			std::string sourceText = sourceStream.str();
-			if (sourceText.empty())
-			{
-				Log::Warning("%s shader source is empty at %s", stageName, module.filepath.c_str());
-				discardProgram();
-				return;
+				return std::unexpected("Unsupported shader stage");
 			}
 
 			unsigned int shaderHandle = glCreateShader(openGLStage);
 			if (shaderHandle == 0)
 			{
-				Log::Warning("Failed to create %s shader for %s", stageName, module.filepath.c_str());
 				discardProgram();
-				return;
+				return std::unexpected("Failed to create OpenGL shader handle for " + stageName + " shader");
 			}
 
-			const char* source = sourceText.c_str();
-			glShaderSource(shaderHandle, 1, &source, nullptr);
+			const char* stageCodeCStr = stageCode.c_str();
+			glShaderSource(shaderHandle, 1, &stageCodeCStr, nullptr);
 			glCompileShader(shaderHandle);
 
 			int status = 0;
@@ -132,18 +171,19 @@ namespace NXTN {
 			if (!status)
 			{
 				int msgLength = 0;
-				glGetShaderiv(shaderHandle, GL_INFO_LOG_LENGTH, &msgLength);
+				glGetShaderiv(shaderHandle, GL_INFO_LOG_LENGTH, &msgLength);  // Error message length
 				std::vector<char> msg(static_cast<size_t>(std::max(msgLength, 1)));
 				glGetShaderInfoLog(shaderHandle, msgLength, nullptr, msg.data());
-				Log::Warning("%s shader failed to compile at %s: %s", stageName, module.filepath.c_str(), msg.data());
 				glDeleteShader(shaderHandle);
 				discardProgram();
-				return;
+				return std::unexpected(
+					"Failed to compile " + stageName + " shader: " + std::string(msg.data())
+				);
 			}
 
 			glAttachShader(program, shaderHandle);
-			shaderHandles.push_back(shaderHandle);
-			compiledStages.push_back(module.stage);
+			compiledShaders.push_back(shaderHandle);
+			compiledStages.push_back(intermediate.stage);
 		}
 
 		glLinkProgram(program);
@@ -153,67 +193,85 @@ namespace NXTN {
 		if (!status)
 		{
 			int msgLength = 0;
-			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &msgLength);
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &msgLength);  // Error message length
 			std::vector<char> msg(static_cast<size_t>(std::max(msgLength, 1)));
 			glGetProgramInfoLog(program, msgLength, nullptr, msg.data());
-			Log::Warning("Shader program failed to link: %s", msg.data());
 			discardProgram();
-			return;
+			return std::unexpected("Failed to link shader program:\n" + std::string(msg.data()));
 		}
 
-		for (unsigned int shader : shaderHandles)
+		for (unsigned int shader : compiledShaders)
 		{
 			glDetachShader(program, shader);
 			glDeleteShader(shader);
 		}
-		shaderHandles.clear();
-		m_RendererID = program;
+		compiledShaders.clear();
 
-		// List shader uniforms
-		int count;
-		glGetProgramiv(m_RendererID, GL_ACTIVE_UNIFORMS, (GLint*)&count);
+		// Uniform reflection
+		std::unordered_map<std::string, OpenGLShaderUniformInfo> uniforms;
+		int uniformCount;  // Number of ACTIVE uniforms
+		glGetProgramiv(program, GL_ACTIVE_UNIFORMS, (GLint*)&uniformCount);
 
 		GLsizei length;  // Length of uniform name
 		GLint size;      // Size of uniform
 		GLenum type;     // Type of uniform
 		char name[64];   // Name of uniform (NOTE: The name should not be longer than 64 char)
-		for (int i = 0; i < count; i++)
+		for (int i = 0; i < uniformCount; i++)
 		{
-			glGetActiveUniform(m_RendererID, (GLuint)i, 64, &length, &size, &type, name);
-			GLint location = glGetUniformLocation(m_RendererID, name);
+			glGetActiveUniform(program, (GLuint)i, 64, &length, &size, &type, name);
+			GLint location = glGetUniformLocation(program, name);
 
 			switch (type)
 			{
 			case GL_INT:
-				m_UniformInfo[std::string(name) ] = { ShaderUniformType::Int, location };
+				uniforms[std::string(name)] = { ShaderVariableType::Int, location };
 				break;
 			case GL_FLOAT:
-				m_UniformInfo[std::string(name) ] = { ShaderUniformType::Float, location };
+				uniforms[std::string(name)] = { ShaderVariableType::Float, location };
 				break;
 			case GL_FLOAT_VEC2:
-				m_UniformInfo[std::string(name) ] = { ShaderUniformType::Float2, location };
+				uniforms[std::string(name)] = { ShaderVariableType::Float2, location };
 				break;
 			case GL_FLOAT_VEC3:
-				m_UniformInfo[std::string(name) ] = { ShaderUniformType::Float3, location };
+				uniforms[std::string(name)] = { ShaderVariableType::Float3, location };
 				break;
 			case GL_FLOAT_VEC4:
-				m_UniformInfo[std::string(name) ] = { ShaderUniformType::Float4, location };
+				uniforms[std::string(name)] = { ShaderVariableType::Float4, location };
 				break;
 			case GL_FLOAT_MAT4:
-				m_UniformInfo[std::string(name) ] = { ShaderUniformType::Mat4, location };
+				uniforms[std::string(name)] = { ShaderVariableType::Mat4, location };
 				break;
 			case GL_BOOL:
-				m_UniformInfo[std::string(name) ] = { ShaderUniformType::Bool, location };
+				uniforms[std::string(name)] = { ShaderVariableType::Bool, location };
 				break;
 			case GL_SAMPLER_2D:
-				m_UniformInfo[std::string(name) ] = { ShaderUniformType::Tex2D, location };
+				uniforms[std::string(name)] = { ShaderVariableType::Tex2D, location };
 				break;
 			case GL_SAMPLER_CUBE:
-				m_UniformInfo[std::string(name) ] = { ShaderUniformType::TexCube, location };
+				uniforms[std::string(name)] = { ShaderVariableType::TexCube, location };
 				break;
 			default:
+				Log::Warning("Active uniform of unknown type: %s", name);
 				break;
 			}
+		}
+
+		return new OpenGLShader(program, std::move(uniforms));
+	}
+
+	OpenGLShader::OpenGLShader(
+		unsigned int id,
+		std::unordered_map<std::string, OpenGLShaderUniformInfo>&& uniforms
+	)
+		: m_RendererID(id), m_UniformInfo(std::move(uniforms))
+	{
+	}
+
+	OpenGLShader::~OpenGLShader()
+	{
+		if (m_RendererID != 0)
+		{
+			glDeleteProgram(m_RendererID);
 		}
 	}
 
@@ -277,14 +335,14 @@ namespace NXTN {
 		glUniform1i(GetUniformPosition(name), slot);
 	}
 
-	std::vector<ShaderUniformDescriptor> OpenGLShader::GetUniformList() const
+	std::vector<ShaderVariableDescriptor> OpenGLShader::GetUniformList() const
 	{
 		return std::ranges::to<std::vector>(
 			std::views::transform(
 				m_UniformInfo,
 				[](const std::pair<const std::string, OpenGLShaderUniformInfo>& entry)
 				{
-					return ShaderUniformDescriptor{
+					return ShaderVariableDescriptor{
 						.name = entry.first,
 						.type = entry.second.type
 					};

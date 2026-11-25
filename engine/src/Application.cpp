@@ -77,12 +77,21 @@ namespace NXTN {
 		//};
 
 		// Shader, Material, and Texture
-		m_MaterialHandle = MaterialManager::Create(ShaderManager::Load(ShaderProgramDescriptor{
+		std::expected<Handle<Shader>, std::string> shaderLoadResult = ShaderManager::Load(
+			"TestShader",
 			{
-				{ ShaderStage::Vertex, "../asset/Shader/Texture.vert" },
-				{ ShaderStage::Fragment, "../asset/Shader/Texture.frag" }
+				//{ ShaderStage::Vertex, "../asset/Shader/Texture.vert" },
+				//{ ShaderStage::Fragment, "../asset/Shader/Texture.frag" }
+				{ ShaderStage::Vertex, "../asset/Shader/TestSyntax.vert" },
+				{ ShaderStage::Fragment, "../asset/Shader/TestSyntax.frag" }
 			}
-		}));
+		);
+		if (shaderLoadResult) {
+			m_MaterialHandle = MaterialManager::Create(*shaderLoadResult);
+		}
+		else {
+			Log::Error(shaderLoadResult.error().c_str());
+		}
 		MaterialManager::Get(m_MaterialHandle)->SetUniformTex2D(
 			"u_MainTex", TextureManager::Create("../asset/Texture/uv_map_rg_bottom_left_1024.png")
 		);
@@ -294,7 +303,7 @@ namespace NXTN {
 						if (!transform) { ImGui::TextUnformatted("No Transform"); }
 						else {
 							Transform draft = *transform;
-						if (UI::TransformEditor(draft)) { *transform = draft; }
+							if (UI::TransformEditor(draft)) { *transform = draft; }
 						}
 					}
 				}

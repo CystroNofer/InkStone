@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Asset/ShaderManager.h"
+#include "Rendering/Texture.h"
 
 namespace NXTN {
 	using MaterialParamVal = std::variant<
@@ -17,7 +18,7 @@ namespace NXTN {
 
 	struct MaterialParam
 	{
-		ShaderUniformType type;
+		ShaderVariableType type;
 		MaterialParamVal value;
 	};
 

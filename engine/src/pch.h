@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <ctime>
 #include <concepts>
+#include <expected>
 #include <functional>
 #include <fstream>
 #include <iostream>

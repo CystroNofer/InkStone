@@ -3,11 +3,9 @@
 #include "Core.h"
 
 #include "Log.h"
-#include "Texture.h"
 #include "Math/Math.h"
 
 namespace NXTN {
-
 	enum class ShaderStage
 	{
 		Vertex,
@@ -16,24 +14,30 @@ namespace NXTN {
 
 	struct ShaderStageDescriptor
 	{
+		// Multiple sub-shader per stage is allowed by some APIs
+		// Though uncommon
 		ShaderStage stage;
 		std::string filepath;
 	};
 
-	struct ShaderProgramDescriptor
-	{
-		std::vector<ShaderStageDescriptor> stages;
-	};
-
-	enum class ShaderUniformType
+	enum class ShaderVariableType
 	{
 		ErrorType = 0, Int, UInt, Float, Float2, Float3, Float4, Mat4, Bool, Tex2D, TexCube
 	};
 
-	struct ShaderUniformDescriptor
+	struct ShaderVariableDescriptor
 	{
 		std::string name;
-		ShaderUniformType type;
+		ShaderVariableType type;
+	};
+
+	struct ShaderStageIntermediateDescriptor
+	{
+		ShaderStage stage;
+		std::vector<ShaderVariableDescriptor> inputs;
+		std::vector<ShaderVariableDescriptor> uniforms;
+		std::vector<ShaderVariableDescriptor> outputs;
+		std::string code;
 	};
 
 	class Shader
@@ -54,7 +58,7 @@ namespace NXTN {
 		virtual void SetUniformMat4(const std::string& name, const mat4& m) = 0;
 		virtual void SetUniformTex2D(const std::string& name, unsigned int slot) = 0;
 
-		virtual std::vector<ShaderUniformDescriptor> GetUniformList() const = 0;
+		virtual std::vector<ShaderVariableDescriptor> GetUniformList() const = 0;
 	};
 }
 

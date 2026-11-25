@@ -4,17 +4,21 @@
 
 #include <GLAD/glad.h>
 
+#include <expected>
+
 namespace NXTN {
 	struct OpenGLShaderUniformInfo
 	{
-		ShaderUniformType type;
+		ShaderVariableType type;
 		GLint location;
 	};
 
 	class OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader(const ShaderProgramDescriptor& description);
+		static std::expected<OpenGLShader*, std::string> Create(
+			const std::vector<ShaderStageIntermediateDescriptor>& stageIntermediates
+		);
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override;
@@ -30,18 +34,14 @@ namespace NXTN {
 		virtual void SetUniformMat4(const std::string& name, const mat4& m) override;
 		virtual void SetUniformTex2D(const std::string& name, unsigned int slot) override;
 
-		virtual inline std::vector<ShaderUniformDescriptor> GetUniformList() const override;
-		inline bool IsValid() const { return m_RendererID != 0; }
+		virtual inline std::vector<ShaderVariableDescriptor> GetUniformList() const override;
 
 	private:
-		void Compile(const ShaderProgramDescriptor& description);
+		OpenGLShader(unsigned int id, std::unordered_map<std::string, OpenGLShaderUniformInfo>&& uniforms);
 
 		GLint GetUniformPosition(const std::string& name);
 
-	private:
 		unsigned int m_RendererID = 0;
-
-		// std::vector<ShaderUniformDescriptor> m_Uniforms;
 		std::unordered_map<std::string, OpenGLShaderUniformInfo> m_UniformInfo;
 	};
 }
